@@ -32,6 +32,7 @@
     "shallow-equals": "^1.0.0"
   },
   "devDependencies": {
+    "babel-plugin-react-css-modules": "^5.2.6",
     "empty": "^0.10.1",
     "jest": "^24.9.0"
   },

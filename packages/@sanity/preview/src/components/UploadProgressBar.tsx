@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styles from './UploadProgressBar.css'
+import styles from './UploadProgressBar.module.css'
 
 export default function UploadProgressBar(props) {
   const {progress} = props
-  const classes = [styles.root, progress === 100 && styles.completed].filter(Boolean).join(' ')
 
   return (
-    <div className={classes}>
+    <div className={styles.root}>
       <div className={styles.inner}>
         <div className={styles.barContainer}>
           <div className={styles.bar} style={{width: `${progress}%`}} />

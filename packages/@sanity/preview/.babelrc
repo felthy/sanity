@@ -1,4 +1,12 @@
 {
   "extends": "../../../.babelrc",
-  "presets": ["@babel/react"]
+  "presets": ["@babel/react", "@babel/typescript"],
+  "plugins": [
+    [
+      "react-css-modules",
+      {
+        "removeImport": true
+      }
+    ]
+  ]
 }
