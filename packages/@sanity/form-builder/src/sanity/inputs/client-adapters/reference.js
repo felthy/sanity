@@ -6,10 +6,9 @@ import {observeForPreview} from 'part:@sanity/base/preview'
 export function getPreviewSnapshot(value, referenceType) {
   return observeForPreview(value, referenceType).pipe(map(result => result.snapshot))
 }
-
 export function search(textTerm, referenceType) {
   const doSearch = createWeightedSearch(referenceType.to, client)
-  return doSearch(textTerm, {includeDrafts: false}).pipe(
-    map(results => results.map(res => res.hit))
-  )
+  return doSearch(textTerm, {
+    includeDrafts: false
+  }).pipe(map(results => results.map(res => res.hit)))
 }

@@ -1,14 +1,13 @@
-import FormBuilderPropTypes from '../../FormBuilderPropTypes'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Fieldset from 'part:@sanity/components/fieldsets/default'
+import FormBuilderPropTypes from '../../FormBuilderPropTypes'
 import {FormBuilderInput} from '../../FormBuilderInput'
 import InvalidValue from '../InvalidValueInput'
 import {resolveTypeName} from '../../utils/resolveTypeName'
-import styles from './styles/Field.css'
-
-// This component renders a single type in an object type. It emits onChange events telling the owner about the name of the type
+import styles from './styles/Field.css' // This component renders a single type in an object type. It emits onChange events telling the owner about the name of the type
 // that changed. This gives the owner an opportunity to use the same event handler function for all of its fields
+
 export default class Field extends React.Component {
   static propTypes = {
     field: FormBuilderPropTypes.field.isRequired,
@@ -22,14 +21,13 @@ export default class Field extends React.Component {
     markers: PropTypes.array,
     level: PropTypes.number
   }
-
   static defaultProps = {
     level: 0,
     focusPath: []
   }
-
   handleChange = event => {
     const {field, onChange} = this.props
+
     if (!field.type.readOnly) {
       onChange(event, field)
     }
@@ -58,10 +56,9 @@ export default class Field extends React.Component {
 
     if (typeof value !== 'undefined') {
       const expectedType = field.type.name
-      const actualType = resolveTypeName(value)
-
-      // todo: we should consider removing this, and not allow aliasing native types
+      const actualType = resolveTypeName(value) // todo: we should consider removing this, and not allow aliasing native types
       // + ensure custom object types always gets annotated with _type
+
       const isCompatible = actualType === field.type.jsonType
 
       if (expectedType !== actualType && !isCompatible) {

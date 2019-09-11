@@ -1,16 +1,19 @@
-// @flow
+
 import React from 'react'
 import {get} from 'lodash'
 import {Item as DefaultItem, List as DefaultList} from 'part:@sanity/components/lists/default'
 import {Item as SortableItem, List as SortableList} from 'part:@sanity/components/lists/sortable'
 import ArrayFunctions from 'part:@sanity/form-builder/input/array/functions'
 import Fieldset from 'part:@sanity/components/fieldsets/default'
-import {PatchEvent, set, unset} from '../../PatchEvent'
 import {startsWith} from '@sanity/util/paths'
+import {PatchEvent, set, unset} from '../../PatchEvent'
 import {resolveTypeName} from '../../utils/resolveTypeName'
-import type {Path} from '../../typedefs/path'
-import type {Type, Marker} from '../../typedefs'
-import type {ItemValue} from '../ArrayInput/typedefs'
+/*:: import type {Path} from '../../typedefs/path'*/
+
+/*:: import type {Type, Marker} from '../../typedefs'*/
+
+/*:: import type {ItemValue} from '../ArrayInput/typedefs'*/
+
 import InvalidValue from '../InvalidValueInput'
 import styles from './styles/ArrayOfPrimitivesInput.css'
 import getEmptyValue from './getEmptyValue'
@@ -29,8 +32,7 @@ function insertAt(arr, index, item) {
   copy.splice(index + 1, 0, item)
   return copy
 }
-
-type Props = {
+/*:: type Props = {
   type: Type,
   value: Array<ItemValue>,
   level: number,
@@ -40,19 +42,27 @@ type Props = {
   focusPath: Path,
   readOnly: ?boolean,
   markers: Array<Marker>
-}
+}*/
 
-export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
-  _element: ?Fieldset
+export default class ArrayOfPrimitivesInput extends React.PureComponent
+/*:: <Props>*/
+{
+  /*:: _element: ?Fieldset*/
   _lastAddedIndex = -1
 
-  set(nextValue: any[]) {
+  set(
+    nextValue
+    /*: any[]*/
+  ) {
     this._lastAddedIndex = -1
     const patch = nextValue.length === 0 ? unset() : set(nextValue)
     this.props.onChange(PatchEvent.from(patch))
   }
 
-  removeAt(index: number) {
+  removeAt(
+    index
+    /*: number*/
+  ) {
     const {value = []} = this.props
     this.set(value.filter((_, i) => i !== index))
     this.props.onFocus([Math.max(0, index - 1)])
@@ -63,7 +73,6 @@ export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
     this.set(value.concat(itemValue))
     onFocus([value.length])
   }
-
   handlePrepend = itemValue => {
     const {value = [], onFocus} = this.props
     this.set([itemValue].concat(value))
@@ -76,27 +85,27 @@ export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
     onFocus([index + 1])
   }
 
-  handleRemoveItem = (index: number) => {
+  handleRemoveItem = (
+    index
+    /*: number*/
+  ) => {
     this.removeAt(index)
   }
-
   handleItemChange = event => {
     this._lastAddedIndex = -1
     this.props.onChange(event)
   }
-
   handleItemEnterKey = index => {
     this.insertAt(index, this.props.type.of[0])
     this._lastAddedIndex = index + 1
   }
-
   handleItemEscapeKey = index => {
     const {value} = this.props
+
     if (index === this._lastAddedIndex && value[index] === '') {
       this.removeAt(index)
     }
   }
-
   handleSortEnd = event => {
     const {value} = this.props
     const {oldIndex, newIndex} = event
@@ -112,7 +121,6 @@ export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
 
   renderItem = (item, index) => {
     const {type, level, markers, value, focusPath, onChange, onFocus, readOnly, onBlur} = this.props
-
     const typeName = resolveTypeName(item)
     const itemMemberType = this.getMemberType(typeName)
 
@@ -131,7 +139,6 @@ export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
     const isSortable = get(type, 'options.sortable') !== false
     const ListItem = isSortable ? SortableItem : DefaultItem
     const filteredMarkers = markers.filter(marker => startsWith([index], marker.path))
-
     return (
       <ListItem key={index} index={index} className={styles.item}>
         <Item
@@ -171,7 +178,10 @@ export default class ArrayOfPrimitivesInput extends React.PureComponent<Props> {
     )
   }
 
-  setElement = (el: ?Fieldset) => {
+  setElement = (
+    el
+    /*: ?Fieldset*/
+  ) => {
     this._element = el
   }
 

@@ -1,19 +1,33 @@
-// @flow
 
 import createEmptyBlock from '../utils/createEmptyBlock'
-import type {SlateEditor, BlockContentFeatures} from '../typeDefs'
+/*:: import type {SlateEditor, BlockContentFeatures} from '../typeDefs'*/
 
-export default function EnsurePlaceHolderBlockPlugin(blockContentFeatures: BlockContentFeatures) {
+export default function EnsurePlaceHolderBlockPlugin(
+  blockContentFeatures
+  /*: BlockContentFeatures*/
+) {
   return {
-    onCommand(command: any, editor: SlateEditor, next: void => void) {
+    onCommand(
+      command,
+      /*: any*/
+      editor,
+      /*: SlateEditor*/
+      next
+      /*: void => void*/
+    ) {
       if (command.type !== 'ensurePlaceHolderBlock') {
         return next()
       }
+
       if (editor.value.document.nodes.size !== 0) {
         return next()
       }
+
       const block = createEmptyBlock(blockContentFeatures)
-      const node = block.toJSON({preserveKeys: true, preserveData: true})
+      const node = block.toJSON({
+        preserveKeys: true,
+        preserveData: true
+      })
       node.data = {...node.data, placeholder: true}
       editor.applyOperation({
         type: 'insert_node',

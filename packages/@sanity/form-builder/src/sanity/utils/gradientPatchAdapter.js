@@ -1,23 +1,38 @@
-// @flow
+
 import {arrayToJSONMatchPath} from '@sanity/mutator'
 import assert from 'assert'
 import {flatten} from 'lodash'
-import type {Origin, Patch} from '../../typedefs/patch'
+/*:: import type {Origin, Patch} from '../../typedefs/patch'*/
+
 import * as convertPath from './convertPath'
+/*:: type GradientPatch = Object*/
 
-type GradientPatch = Object
-
-export function toGradient(patches: Patch[]): GradientPatch[] {
+export function toGradient(
+  patches
+  /*: Patch[]*/
+) {
+  /*: GradientPatch[]*/
   return patches.map(toGradientPatch)
 }
-
-export function toFormBuilder(origin: Origin, patches: GradientPatch[]): Patch[] {
+export function toFormBuilder(
+  origin,
+  /*: Origin*/
+  patches
+  /*: GradientPatch[]*/
+) {
+  /*: Patch[]*/
   return flatten(patches.map(patch => toFormBuilderPatch(origin, patch)))
 }
 
 const notIn = values => value => !values.includes(value)
 
-function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
+function toFormBuilderPatch(
+  origin,
+  /*: Origin*/
+  patch
+  /*: GradientPatch*/
+) {
+  /*: Patch*/
   return flatten(
     Object.keys(patch)
       .filter(notIn(['id', 'ifRevisionID', 'query']))
@@ -31,6 +46,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
             }
           })
         }
+
         if (type === 'insert') {
           const position = 'before' in patch.insert ? 'before' : 'after'
           return {
@@ -41,6 +57,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
             origin
           }
         }
+
         return Object.keys(patch[type])
           .map(gradientPath => {
             if (type === 'set') {
@@ -51,6 +68,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
                 origin
               }
             }
+
             if (type === 'inc' || type === 'dec') {
               return {
                 type: type,
@@ -59,6 +77,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
                 origin
               }
             }
+
             if (type === 'setIfMissing') {
               return {
                 type: 'setIfMissing',
@@ -67,6 +86,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
                 origin
               }
             }
+
             if (type === 'diffMatchPatch') {
               return {
                 type: 'diffMatchPatch',
@@ -75,6 +95,7 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
                 origin
               }
             }
+
             console.warn(new Error(`Unsupported patch type: ${type}`))
             return null
           })
@@ -83,8 +104,13 @@ function toFormBuilderPatch(origin: Origin, patch: GradientPatch): Patch {
   )
 }
 
-function toGradientPatch(patch: Patch): GradientPatch {
+function toGradientPatch(
+  patch
+  /*: Patch*/
+) {
+  /*: GradientPatch*/
   const matchPath = arrayToJSONMatchPath(patch.path || [])
+
   if (patch.type === 'insert') {
     const {position, items} = patch
     return {
@@ -102,6 +128,7 @@ function toGradientPatch(patch: Patch): GradientPatch {
   }
 
   assert(patch.type, `Missing patch type in patch ${JSON.stringify(patch)}`)
+
   if (matchPath) {
     return {
       [patch.type]: {
@@ -109,6 +136,7 @@ function toGradientPatch(patch: Patch): GradientPatch {
       }
     }
   }
+
   return {
     [patch.type]: patch.value
   }

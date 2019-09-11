@@ -1,5 +1,5 @@
-import hasOwn from '../utils/hasOwn'
 import {findIndex} from 'lodash'
+import hasOwn from '../utils/hasOwn'
 import applyPatch from './applyPatch'
 import insert from './arrayInsert'
 
@@ -15,6 +15,7 @@ function findTargetIndex(array, pathSegment) {
   if (typeof pathSegment === 'number') {
     return pathSegment
   }
+
   const index = findIndex(array, pathSegment)
   return index === -1 ? false : index
 }
@@ -29,12 +30,14 @@ export default function apply(value, patch) {
         // eslint-disable-line max-depth
         throw new Error('Cannot set value of an array to a non-array')
       }
+
       return value === undefined ? patch.value : value
     } else if (patch.type === 'set') {
       if (!Array.isArray(patch.value)) {
         // eslint-disable-line max-depth
         throw new Error('Cannot set value of an array to a non-array')
       }
+
       return patch.value
     } else if (patch.type === 'unset') {
       return undefined
@@ -47,16 +50,16 @@ export default function apply(value, patch) {
           )}`
         )
       }
+
       return move(nextValue, patch.value.from, patch.value.to)
     }
+
     throw new Error(`Invalid array operation: ${patch.type}`)
   }
 
   const [head, ...tail] = patch.path
+  const index = findTargetIndex(value, head) // If the given selector could not be found, return as-is
 
-  const index = findTargetIndex(value, head)
-
-  // If the given selector could not be found, return as-is
   if (index === false) {
     return nextValue
   }
@@ -69,15 +72,12 @@ export default function apply(value, patch) {
       if (typeof index !== 'number') {
         throw new Error(`Expected array index to be a number, instead got "${index}"`)
       }
+
       nextValue.splice(index, 1)
       return nextValue
     }
-  }
+  } // The patch is not directed to me
 
-  // The patch is not directed to me
-  nextValue[index] = applyPatch(nextValue[index], {
-    ...patch,
-    path: tail
-  })
+  nextValue[index] = applyPatch(nextValue[index], {...patch, path: tail})
   return nextValue
 }

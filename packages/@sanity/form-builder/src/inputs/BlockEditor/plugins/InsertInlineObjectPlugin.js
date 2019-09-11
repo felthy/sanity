@@ -1,11 +1,15 @@
-// @flow
+
 import {Inline} from 'slate'
-import {randomKey} from '@sanity/block-tools'
-import {editorValueToBlocks, blocksToEditorValue} from '@sanity/block-tools'
-import type {SlateEditor, Type} from '../typeDefs'
+import {randomKey, editorValueToBlocks, blocksToEditorValue} from '@sanity/block-tools'
+
+/*:: import type {SlateEditor, Type} from '../typeDefs'*/
+
 import {VALUE_TO_JSON_OPTS} from '../utils/createOperationToPatches'
 
-export default function InsertInlineObjectPlugin(blockContentType: Type) {
+export default function InsertInlineObjectPlugin(
+  blockContentType
+  /*: Type*/
+) {
   function normalizeBlock(block) {
     return blocksToEditorValue(
       editorValueToBlocks(
@@ -19,11 +23,20 @@ export default function InsertInlineObjectPlugin(blockContentType: Type) {
       blockContentType
     ).document.nodes[0]
   }
+
   return {
-    onCommand(command: any, editor: SlateEditor, next: void => void) {
+    onCommand(
+      command,
+      /*: any*/
+      editor,
+      /*: SlateEditor*/
+      next
+      /*: void => void*/
+    ) {
       if (command.type !== 'insertInlineObject') {
         return next()
       }
+
       const options = command.args[0] || {}
       const {objectType} = options
       const key = options.key || randomKey(12)
@@ -33,13 +46,15 @@ export default function InsertInlineObjectPlugin(blockContentType: Type) {
         isVoid: true,
         data: {
           _key: key,
-          value: {_type: objectType.name, _key: key}
+          value: {
+            _type: objectType.name,
+            _key: key
+          }
         }
       }
       const inline = Inline.create(inlineProps)
-      editor.insertInline(inline)
+      editor.insertInline(inline) // Normalize the keys in the block nodes to match what is sent to gradient
 
-      // Normalize the keys in the block nodes to match what is sent to gradient
       const inlinePath = editor.value.selection.focus.path
       const block = editor.value.focusBlock
       editor.replaceNodeByKey(block.key, normalizeBlock(block))

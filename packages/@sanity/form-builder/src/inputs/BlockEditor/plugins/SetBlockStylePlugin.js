@@ -1,19 +1,25 @@
-// @flow
-import type {SlateEditor} from '../typeDefs'
 
-// This plugin sets the style on a block
 
+/*:: import type {SlateEditor} from '../typeDefs'*/
 export default function SetBlockStylePlugin() {
   return {
     // eslint-disable-next-line complexity
-    onCommand(command: any, editor: SlateEditor, next: void => void) {
+    onCommand(
+      command,
+      /*: any*/
+      editor,
+      /*: SlateEditor*/
+      next
+      /*: void => void*/
+    ) {
       if (command.type !== 'setBlockStyle') {
         return next()
       }
+
       const {selection, startBlock, endBlock} = editor.value
-      const styleName = command.args[0]
-      // If a single block is selected partially, split block conditionally
+      const styleName = command.args[0] // If a single block is selected partially, split block conditionally
       // (selection in start, middle or end of text)
+
       if (
         startBlock === endBlock &&
         selection.isExpanded &&
@@ -46,12 +52,15 @@ export default function SetBlockStylePlugin() {
             .splitBlock()
             .moveToStartOfPreviousBlock()
         }
-      }
-      // Do the actual style transform, only acting on type contentBlock
+      } // Do the actual style transform, only acting on type contentBlock
+
       editor.value.blocks.forEach(blk => {
         const newData = {...blk.data.toObject(), style: styleName}
+
         if (blk.type === 'contentBlock') {
-          editor.setNodeByKey(blk.key, {data: newData})
+          editor.setNodeByKey(blk.key, {
+            data: newData
+          })
         }
       })
       return editor

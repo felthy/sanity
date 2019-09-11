@@ -1,19 +1,26 @@
-//@flow
 import React from 'react'
 import Select from 'part:@sanity/components/selects/default'
 import RadioSelect from 'part:@sanity/components/selects/radio'
-import PatchEvent, {set} from '../PatchEvent'
 import FormField from 'part:@sanity/components/formfields/default'
-import type {Type, Marker} from '../typedefs'
+/*:: import type {Type, Marker} from '../typedefs'*/
+
 import {uniqueId} from 'lodash'
+import PatchEvent, {set} from '../PatchEvent'
 
-const EMPTY_ITEM = {title: '', value: undefined}
-
-function toSelectItems(list) {
-  return typeof list[0] === 'string' ? list.map(item => ({title: item, value: item})) : list
+const EMPTY_ITEM = {
+  title: '',
+  value: undefined
 }
 
-type Props = {
+function toSelectItems(list) {
+  return typeof list[0] === 'string'
+    ? list.map(item => ({
+        title: item,
+        value: item
+      }))
+    : list
+}
+/*:: type Props = {
   type: Type,
   level: number,
   value: ?string,
@@ -21,19 +28,21 @@ type Props = {
   onChange: PatchEvent => void,
   onFocus: () => void,
   markers: Array<Marker>
-}
+}*/
 
-export default class StringSelect extends React.Component<Props> {
-  _input: ?(RadioSelect | Select)
+export default class StringSelect extends React.Component
+/*:: <Props>*/
+{
+  /*:: _input: ?(RadioSelect | Select)*/
   name = uniqueId('RadioName')
-
   static defaultProps = {
     value: ''
   }
-
-  handleChange = (item: Object) => {
+  handleChange = (
+    item
+    /*: Object*/
+  ) => {
     const {onChange} = this.props
-
     onChange(PatchEvent.from(set(typeof item === 'string' ? item : item.value)))
   }
 
@@ -43,22 +52,21 @@ export default class StringSelect extends React.Component<Props> {
     }
   }
 
-  setInput = (input: ?(RadioSelect | Select)) => {
+  setInput = (
+    input
+    /*: ?(RadioSelect | Select)*/
+  ) => {
     this._input = input
   }
 
   render() {
     const {value, readOnly, markers, type, level, onFocus} = this.props
     const items = toSelectItems(type.options.list || [])
-
     const currentItem = items.find(item => item.value === value)
-
     const isRadio = type.options && type.options.layout === 'radio'
-
     return (
       <FormField markers={markers} level={level} label={type.title} description={type.description}>
-        {isRadio ? (
-          // todo: make separate inputs
+        {isRadio ? ( // todo: make separate inputs
           <RadioSelect
             name={this.name}
             legend={type.title}

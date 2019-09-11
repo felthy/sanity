@@ -3,6 +3,7 @@ import applyPatch from './applyPatch'
 
 export default function apply(value, patch) {
   const nextValue = clone(value)
+
   if (patch.path.length === 0) {
     // its directed to me
     if (patch.type === 'set') {
@@ -10,6 +11,7 @@ export default function apply(value, patch) {
         // eslint-disable-line max-depth
         throw new Error('Cannot set value of an object to a non-object')
       }
+
       return patch.value
     } else if (patch.type === 'unset') {
       return undefined
@@ -17,11 +19,12 @@ export default function apply(value, patch) {
       // console.log('IS IT missing?', value)
       return value === undefined ? patch.value : value
     }
-    throw new Error(`Invalid object operation: ${patch.type}`)
-  }
 
-  // The patch is not directed to me
+    throw new Error(`Invalid object operation: ${patch.type}`)
+  } // The patch is not directed to me
+
   const [head, ...tail] = patch.path
+
   if (typeof head !== 'string') {
     throw new Error(`Expected field name to be a string, instad got: ${head}`)
   }
@@ -30,9 +33,6 @@ export default function apply(value, patch) {
     return omit(nextValue, head)
   }
 
-  nextValue[head] = applyPatch(nextValue[head], {
-    ...patch,
-    path: tail
-  })
+  nextValue[head] = applyPatch(nextValue[head], {...patch, path: tail})
   return nextValue
 }

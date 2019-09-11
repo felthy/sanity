@@ -1,25 +1,27 @@
 import React from 'react'
 import ChevronDown from 'part:@sanity/base/chevron-down-icon'
 import ToggleButton from 'part:@sanity/components/toggles/button'
-import styles from './styles/CollapsibleButtonGroup.css'
 import PropTypes from 'prop-types'
 import Poppable from 'part:@sanity/components/utilities/poppable'
+import styles from './styles/CollapsibleButtonGroup.css'
 
 export default class CollapsibleButtonGroup extends React.Component {
   state = {
     isOpen: false
   }
-
   handleOpen = () => {
-    this.setState({isOpen: true})
+    this.setState({
+      isOpen: true
+    })
   }
-
   handleClose = () => {
-    this.setState({isOpen: false})
+    this.setState({
+      isOpen: false
+    })
   }
-
   handleToggle = () => {
     const {isOpen} = this.state
+
     if (isOpen) {
       this.handleClose()
     } else {
@@ -31,7 +33,6 @@ export default class CollapsibleButtonGroup extends React.Component {
     const {icon, children} = this.props
     const {isOpen} = this.state
     const Icon = icon
-
     return (
       <div className={styles.root}>
         <ToggleButton onClick={this.handleToggle}>
@@ -45,7 +46,6 @@ export default class CollapsibleButtonGroup extends React.Component {
     )
   }
 }
-
 CollapsibleButtonGroup.propTypes = {
   children: PropTypes.node,
   icon: PropTypes.any

@@ -1,15 +1,14 @@
-// @flow
+
 import React from 'react'
-import SanityFormBuilderContext from './SanityFormBuilderContext'
 import {FormBuilderInput} from '../FormBuilderInput'
 import {Marker} from '../typedefs'
-
-type PatchChannel = {
+import SanityFormBuilderContext from './SanityFormBuilderContext'
+/*:: type PatchChannel = {
   subscribe: () => () => {},
   receivePatches: (patches: Array<*>) => void
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   value: ?any,
   schema: any,
   type: Object,
@@ -22,17 +21,22 @@ type Props = {
   onBlur: () => void,
   autoFocus: boolean,
   focusPath: Path
-}
+}*/
 
-export default class SanityFormBuilder extends React.Component<Props> {
-  _input: ?FormBuilderInput
-
-  setInput = (input: ?FormBuilderInput) => {
+export default class SanityFormBuilder extends React.Component
+/*:: <Props>*/
+{
+  /*:: _input: ?FormBuilderInput*/
+  setInput = (
+    input
+    /*: ?FormBuilderInput*/
+  ) => {
     this._input = input
   }
 
   componentDidMount() {
     const {autoFocus} = this.props
+
     if (this._input && autoFocus) {
       this._input.focus()
     }
@@ -52,13 +56,8 @@ export default class SanityFormBuilder extends React.Component<Props> {
       focusPath,
       filterField
     } = this.props
-
     return (
-      <SanityFormBuilderContext
-        value={value}
-        schema={schema}
-        patchChannel={patchChannel}
-      >
+      <SanityFormBuilderContext value={value} schema={schema} patchChannel={patchChannel}>
         <FormBuilderInput
           type={type}
           onChange={onChange}
@@ -77,5 +76,4 @@ export default class SanityFormBuilder extends React.Component<Props> {
     )
   }
 }
-
 SanityFormBuilder.createPatchChannel = SanityFormBuilderContext.createPatchChannel

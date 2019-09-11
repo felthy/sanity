@@ -1,9 +1,7 @@
-// @flow
 
 // Provides a utility component for easy editing a value of a schema type with the form builder
 // Manages server sync, mutations, etc. and passes a value + onChange to a child component
 // Note: Experimental, and likely to change in the future
-
 import PropTypes from 'prop-types'
 import React from 'react'
 import {throttle} from 'lodash'
@@ -11,22 +9,22 @@ import subscriptionManager from '../utils/subscriptionManager'
 import PatchEvent from '../PatchEvent'
 import {checkout} from './formBuilderValueStore'
 import SanityFormBuilderContext from './SanityFormBuilderContext'
-
-type State = {
+/*:: type State = {
   isLoading: boolean,
   isSaving: boolean,
   value: ?any,
   deletedSnapshot: ?any
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   documentId: string,
   typeName: string,
   schema: Object,
   children: Function
-}
+}*/
 
-function getInitialState(): State {
+function getInitialState() {
+  /*: State*/
   return {
     isLoading: true,
     isSaving: false,
@@ -35,31 +33,34 @@ function getInitialState(): State {
   }
 }
 
-export default class WithFormBuilderValue extends React.PureComponent<Props, State> {
-  document: Object
-
+export default class WithFormBuilderValue extends React.PureComponent
+/*:: <Props, State>*/
+{
+  /*:: document: Object*/
   static childContextTypes = {
     formBuilder: PropTypes.object
   }
-
   subscriptions = subscriptionManager('documentEvents', 'commit')
-
   state = getInitialState()
   patchChannel = SanityFormBuilderContext.createPatchChannel()
 
-  checkoutDocument(documentId: string) {
+  checkoutDocument(
+    documentId
+    /*: string*/
+  ) {
     this.document = checkout(documentId)
-
     this.subscriptions.replace(
       'documentEvents',
       this.document.events.subscribe({
-        next: this.handleDocumentEvent
-        // error: this.handleDocumentError
+        next: this.handleDocumentEvent // error: this.handleDocumentError
       })
     )
   }
 
-  handleDocumentEvent = (event: {type: string, document: any}) => {
+  handleDocumentEvent = (
+    event
+    /*: {type: string, document: any}*/
+  ) => {
     switch (event.type) {
       case 'snapshot': {
         this.setState({
@@ -68,22 +69,26 @@ export default class WithFormBuilderValue extends React.PureComponent<Props, Sta
         })
         break
       }
+
       case 'rebase': {
         this.setState({
           value: event.document
         })
         break
       }
+
       case 'mutation': {
         this.handleIncomingMutationEvent(event)
         break
       }
+
       case 'create': {
         this.setState({
           value: event.document
         })
         break
       }
+
       default: {
         // eslint-disable-next-line no-console
         console.log('Unhandled document event type "%s"', event.type, event)
@@ -99,21 +104,26 @@ export default class WithFormBuilderValue extends React.PureComponent<Props, Sta
     this.checkoutDocument(this.props.documentId)
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(
+    nextProps
+    /*: Props*/
+  ) {
     if (nextProps.documentId !== this.props.documentId) {
       this.setState(getInitialState())
       this.checkoutDocument(nextProps.documentId)
     }
   }
 
-  handleIncomingMutationEvent(event: any) {
+  handleIncomingMutationEvent(
+    event
+    /*: any*/
+  ) {
     // Broadcast incoming patches to input components that applies patches on their own
     // Note: This is *experimental* and likely to change in the near future
     this.patchChannel.receivePatches({
       patches: event.patches,
       snapshot: event.document
     })
-
     this.setState({
       deletedSnapshot: event.deletedSnapshot,
       value: event.document
@@ -122,7 +132,9 @@ export default class WithFormBuilderValue extends React.PureComponent<Props, Sta
 
   commit = throttle(
     () => {
-      this.setState({isSaving: true})
+      this.setState({
+        isSaving: true
+      })
       this.subscriptions.replace(
         'commit',
         this.document.commit().subscribe({
@@ -133,16 +145,23 @@ export default class WithFormBuilderValue extends React.PureComponent<Props, Sta
             // todo
           },
           complete: () => {
-            this.setState({isSaving: false})
+            this.setState({
+              isSaving: false
+            })
           }
         })
       )
     },
     1000,
-    {leading: true, trailing: true}
+    {
+      leading: true,
+      trailing: true
+    }
   )
-
-  handleChange = (event: PatchEvent) => {
+  handleChange = (
+    event
+    /*: PatchEvent*/
+  ) => {
     this.document.createIfNotExists({
       _id: this.props.documentId,
       _type: this.props.typeName
@@ -150,13 +169,14 @@ export default class WithFormBuilderValue extends React.PureComponent<Props, Sta
     this.document.patch(event.patches)
     this.commit()
   }
-
   handleDelete = () => {
     this.document.delete()
     this.commit()
   }
-
-  handleCreate = (document: any) => {
+  handleCreate = (
+    document
+    /*: any*/
+  ) => {
     this.document.create(document)
     this.commit()
   }

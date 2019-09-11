@@ -3,16 +3,14 @@ import React from 'react'
 import Button from 'part:@sanity/components/buttons/default'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import PopOver from 'part:@sanity/components/dialogs/popover'
-
 import styles from './styles/ConfirmButton.css'
 
 export default class ConfirmButton extends React.Component {
-  _confirmButton: ?Button
+  /*:: _confirmButton: ?Button*/
   static propTypes = {
     children: PropTypes.func,
     onConfirm: PropTypes.func
   }
-
   state = {
     showConfirmDialog: false
   }
@@ -21,6 +19,7 @@ export default class ConfirmButton extends React.Component {
     this.setState({
       showConfirmDialog: false
     })
+
     this._button.focus()
   }
 
@@ -33,16 +32,19 @@ export default class ConfirmButton extends React.Component {
   handleClick = event => {
     this.open()
   }
-
   handleConfirmPopoverClose = event => {
     this.close()
   }
-
-  setButton = (button: ?Button) => {
+  setButton = (
+    button
+    /*: ?Button*/
+  ) => {
     this._button = button
   }
-
-  setConfirmButton = (button: ?Button) => {
+  setConfirmButton = (
+    button
+    /*: ?Button*/
+  ) => {
     this._confirmButton = button
   }
 

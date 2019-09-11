@@ -1,7 +1,8 @@
-// @flow
-import type {Type} from '../../typedefs'
 
-export type ArrayType = Type & {
+
+/*:: import type {Type} from '../../typedefs'*/
+
+/*:: export type ArrayType = Type & {
   name: string,
   title: string,
   description: string,
@@ -12,9 +13,9 @@ export type ArrayType = Type & {
     layout?: 'grid'
   },
   of: Array<Type>
-}
+}*/
 
-export type ItemValue = {
+/*:: export type ItemValue = {
   _type?: string,
   _key: string
-}
+}*/

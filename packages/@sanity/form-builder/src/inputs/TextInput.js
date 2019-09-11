@@ -1,11 +1,10 @@
-//@flow
 import React from 'react'
 import FormField from 'part:@sanity/components/formfields/default'
 import TextArea from 'part:@sanity/components/textareas/default'
 import PatchEvent, {set, unset} from '../PatchEvent'
-import type {Type, Marker} from '../typedefs'
+/*:: import type {Type, Marker} from '../typedefs'*/
 
-type Props = {
+/*:: type Props = {
   type: Type,
   level: number,
   value: ?string,
@@ -14,12 +13,16 @@ type Props = {
   onFocus: () => void,
   onBlur: () => void,
   markers: Array<Marker>
-}
+}*/
 
-export default class TextInput extends React.Component<Props> {
-  _input: ?TextArea
-
-  handleChange = (event: SyntheticEvent<HTMLInputElement>) => {
+export default class TextInput extends React.Component
+/*:: <Props>*/
+{
+  /*:: _input: ?TextArea*/
+  handleChange = (
+    event
+    /*: SyntheticEvent<HTMLInputElement>*/
+  ) => {
     const value = event.currentTarget.value
     this.props.onChange(PatchEvent.from(value ? set(value) : unset()))
   }
@@ -30,7 +33,10 @@ export default class TextInput extends React.Component<Props> {
     }
   }
 
-  setInput = (input: ?TextArea) => {
+  setInput = (
+    input
+    /*: ?TextArea*/
+  ) => {
     this._input = input
   }
 
@@ -38,7 +44,6 @@ export default class TextInput extends React.Component<Props> {
     const {value, markers, type, readOnly, level, onFocus, onBlur} = this.props
     const validation = markers.filter(marker => marker.type === 'validation')
     const errors = validation.filter(marker => marker.level === 'error')
-
     return (
       <FormField markers={markers} level={level} label={type.title} description={type.description}>
         <TextArea

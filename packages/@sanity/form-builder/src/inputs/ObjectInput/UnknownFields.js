@@ -1,19 +1,20 @@
-// @flow
+
 import React from 'react'
-import Details from '../common/Details'
 import DefaultButton from 'part:@sanity/components/buttons/default'
+import ActivateOnFocus from 'part:@sanity/components/utilities/activate-on-focus'
+import Details from '../common/Details'
 import PatchEvent, {unset} from '../../PatchEvent'
 import styles from './styles/UnknownFields.css'
-import ActivateOnFocus from 'part:@sanity/components/utilities/activate-on-focus'
-
-type Props = {
+/*:: type Props = {
   fieldNames: string[],
   value: Object,
   onChange: PatchEvent => void,
   readOnly?: boolean
-}
+}*/
 
-export default class UnknownFields extends React.Component<Props> {
+export default class UnknownFields extends React.Component
+/*:: <Props>*/
+{
   handleUnsetClick = fieldName => {
     this.props.onChange(PatchEvent.from(unset([fieldName])))
   }

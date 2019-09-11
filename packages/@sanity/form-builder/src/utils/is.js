@@ -6,7 +6,6 @@ function is(typeName, type) {
 
 export default is
 export {is as type}
-
 export function primitive(type) {
   return PRIMITIVES.some(typeName => is(typeName, type))
 }

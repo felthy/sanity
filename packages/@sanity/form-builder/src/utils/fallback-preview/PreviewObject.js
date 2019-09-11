@@ -1,18 +1,21 @@
-// @flow
+
 import React from 'react'
 import {capitalize} from 'lodash'
 import {PreviewAny} from './PreviewAny'
-
-type Props = {
+/*:: type Props = {
   value: Object,
   maxDepth?: number,
   _depth?: number
-}
+}*/
 
-export function PreviewObject(props: Props) {
+export function PreviewObject(
+  props
+  /*: Props*/
+) {
   const {value, maxDepth = 4, _depth = 0, ...rest} = props
   const {_type, _key, ...restValue} = value
   const keys = Object.keys(restValue)
+
   if (_depth >= maxDepth) {
     return (
       <span>
@@ -20,6 +23,7 @@ export function PreviewObject(props: Props) {
       </span>
     )
   }
+
   return (
     <div>
       {_type && (

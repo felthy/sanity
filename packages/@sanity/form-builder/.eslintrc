@@ -1,0 +1,6 @@
+{
+  "extends": ["../../../.eslintrc-ts.js"],
+  "rules": {
+    "react/jsx-filename-extension": ["error", {"extensions": [".js", ".tsx"]}]
+  }
+}

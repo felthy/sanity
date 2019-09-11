@@ -3,27 +3,26 @@
  *
  */
 
-// @flow
 import React from 'react'
-import type {Path} from '../../typedefs/path'
-import {toFormBuilder, toGradient} from '../utils/convertPath'
+/*:: import type {Path} from '../../typedefs/path'*/
 
-type ChildArgs = {
+import {toFormBuilder, toGradient} from '../utils/convertPath'
+/*:: type ChildArgs = {
   onFocus: (path: Path) => void,
   onBlur: () => void,
   focusPath: Path
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   focusPath: ?any,
   onFocus: () => {},
   onBlur: () => {},
   children: ChildArgs => any
-}
+}*/
 
-type State = {
+/*:: type State = {
   focusPath: Array<*>
-}
+}*/
 
 function getHash() {
   return decodeURIComponent(document.location.hash.substring(1))
@@ -34,7 +33,9 @@ function getPathFromHash() {
   return hash ? toFormBuilder(hash) : []
 }
 
-export default class HashFocusManager extends React.Component<Props, State> {
+export default class HashFocusManager extends React.Component
+/*:: <Props, State>*/
+{
   state = {
     focusPath: getPathFromHash()
   }
@@ -48,13 +49,16 @@ export default class HashFocusManager extends React.Component<Props, State> {
   }
 
   handleHashChange = () => {
-    this.setState({focusPath: getPathFromHash()})
+    this.setState({
+      focusPath: getPathFromHash()
+    })
   }
-
-  handleFocus = (focusPath: Path) => {
+  handleFocus = (
+    focusPath
+    /*: Path*/
+  ) => {
     document.location.hash = toGradient(focusPath)
   }
-
   handleBlur = () => {
     // this.setState({focusPath: []})
   }

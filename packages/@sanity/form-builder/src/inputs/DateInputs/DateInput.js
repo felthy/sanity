@@ -1,28 +1,27 @@
-// @flow
-import type Moment from 'moment'
+
+
+/*:: import type Moment from 'moment'*/
 import moment from 'moment'
 import React from 'react'
 import PatchEvent, {set, unset} from '../../PatchEvent'
-import type {Marker} from '../../typedefs'
-import BaseDateTimeInput from './BaseDateTimeInput'
+/*:: import type {Marker} from '../../typedefs'*/
 
-type ParsedOptions = {
+import BaseDateTimeInput from './BaseDateTimeInput'
+/*:: type ParsedOptions = {
   dateFormat: string,
   calendarTodayLabel: string
-}
+}*/
 
-type SchemaOptions = {
+/*:: type SchemaOptions = {
   dateFormat?: string,
   calendarTodayLabel?: string
-}
+}*/
 
 // This is the format dates are stored on
-const VALUE_FORMAT = 'YYYY-MM-DD'
+const VALUE_FORMAT = 'YYYY-MM-DD' // default to how they are stored
 
-// default to how they are stored
 const DEFAULT_DATE_FORMAT = VALUE_FORMAT
-
-type Props = {
+/*:: type Props = {
   value: string,
   markers: Array<Marker>,
   type: {
@@ -35,19 +34,29 @@ type Props = {
   readOnly: ?boolean,
   onChange: PatchEvent => void,
   level: number
-}
+}*/
 
-function parseOptions(options: SchemaOptions = {}): ParsedOptions {
+function parseOptions(
+  /*: SchemaOptions*/
+  options = {}
+) {
+  /*: ParsedOptions*/
   return {
     dateFormat: options.dateFormat || DEFAULT_DATE_FORMAT,
     calendarTodayLabel: options.calendarTodayLabel || 'Today'
   }
 }
 
-export default class DateInput extends React.Component<Props> {
-  baseDateTimeInputRef: ?BaseDateTimeInput = null
-
-  handleChange = (nextMoment?: Moment) => {
+export default class DateInput extends React.Component
+/*:: <Props>*/
+{
+  baseDateTimeInputRef =
+    /*: ?BaseDateTimeInput*/
+    null
+  handleChange = (
+    nextMoment
+    /*:: ?: Moment*/
+  ) => {
     const patch = nextMoment ? set(nextMoment.format(VALUE_FORMAT)) : unset()
     this.props.onChange(PatchEvent.from([patch]))
   }
@@ -58,17 +67,20 @@ export default class DateInput extends React.Component<Props> {
     }
   }
 
-  setBaseInput = (baseInput: ?BaseDateTimeInput) => {
+  setBaseInput = (
+    baseInput
+    /*: ?BaseDateTimeInput*/
+  ) => {
     this.baseDateTimeInputRef = baseInput
   }
 
   render() {
     const {value, markers, type, readOnly, level} = this.props
     const {title, description} = type
-    const momentValue: ?Moment = value ? moment(value) : null
-
+    const momentValue =
+      /*: ?Moment*/
+      value ? moment(value) : null
     const options = parseOptions(type.options)
-
     return (
       <BaseDateTimeInput
         dateOnly

@@ -6,21 +6,26 @@ import Dialog from 'part:@sanity/components/dialogs/default'
 import DialogContent from 'part:@sanity/components/dialogs/content'
 import {List, Item} from 'part:@sanity/components/lists/default'
 import {WithReferringDocuments} from 'part:@sanity/base/with-referring-documents'
-import Preview from '../../Preview'
 import schema from 'part:@sanity/base/schema'
 import {IntentLink} from 'part:@sanity/base/router'
 import client from 'part:@sanity/base/client'
-
-import styles from './styles/Asset.css'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import LinkIcon from 'part:@sanity/base/link-icon'
 import MoreVertIcon from 'part:@sanity/base/more-vert-icon'
-
 import {get} from 'lodash'
+import Preview from '../../Preview'
+import styles from './styles/Asset.css'
 
-const DIALOG_DELETE_ACTION = {name: 'delete', title: 'Delete', icon: TrashIcon, color: 'danger'}
-const DIALOG_CLOSE_ACTION = {name: 'close', title: 'Close'}
-
+const DIALOG_DELETE_ACTION = {
+  name: 'delete',
+  title: 'Delete',
+  icon: TrashIcon,
+  color: 'danger'
+}
+const DIALOG_CLOSE_ACTION = {
+  name: 'close',
+  title: 'Close'
+}
 export default class Asset extends React.PureComponent {
   static propTypes = {
     asset: PropTypes.shape({
@@ -32,15 +37,15 @@ export default class Asset extends React.PureComponent {
     onKeyPress: PropTypes.func,
     onDeleteFinished: PropTypes.func.isRequired
   }
-
   state = {
     isDeleting: false,
     dialogType: undefined
   }
-
   handleDeleteAsset = asset => {
     const {onDeleteFinished} = this.props
-    this.setState({isDeleting: true})
+    this.setState({
+      isDeleting: true
+    })
     return client
       .delete(asset._id)
       .then(() => {
@@ -53,18 +58,16 @@ export default class Asset extends React.PureComponent {
         this.setState({
           isDeleting: false,
           dialogType: 'error'
-        })
-        // eslint-disable-next-line
+        }) // eslint-disable-next-line
+
         console.error('Could not delete asset', err)
       })
   }
-
   handleDialogClose = () => {
     this.setState({
       dialogType: null
     })
   }
-
   handleMenuAction = action => {
     if (action.name === 'delete') {
       this.handleDeleteAsset(this.props.asset)
@@ -74,7 +77,6 @@ export default class Asset extends React.PureComponent {
       })
     }
   }
-
   handleDialogAction = action => {
     if (action.name === 'close') {
       this.handleDialogClose()
@@ -82,7 +84,6 @@ export default class Asset extends React.PureComponent {
       this.handleDeleteAsset(this.props.asset)
     }
   }
-
   renderMenuItem = item => {
     const {color, title, icon} = item
     const Icon = icon
@@ -92,7 +93,6 @@ export default class Asset extends React.PureComponent {
       </div>
     )
   }
-
   getDialogActions = dialogType => {
     if (dialogType != 'error') {
       return [DIALOG_DELETE_ACTION, DIALOG_CLOSE_ACTION]
@@ -109,11 +109,9 @@ export default class Asset extends React.PureComponent {
       typeof window === 'undefined' || !window.devicePixelRatio
         ? 1
         : Math.round(window.devicePixelRatio)
-
     const imgH = 100 * Math.max(1, dpi)
     const width = get(asset, 'metadata.dimensions.width') || 100
     const height = get(asset, 'metadata.dimensions.height') || 100
-
     const menuItems = [
       {
         name: 'showRefs',
@@ -127,7 +125,6 @@ export default class Asset extends React.PureComponent {
         icon: TrashIcon
       }
     ]
-
     return (
       <a
         className={styles.item}
@@ -139,7 +136,12 @@ export default class Asset extends React.PureComponent {
           flexGrow: `${(width * size) / height}`
         }}
       >
-        <i className={styles.padder} style={{paddingBottom: `${(height / width) * 100}%`}} />
+        <i
+          className={styles.padder}
+          style={{
+            paddingBottom: `${(height / width) * 100}%`
+          }}
+        />
         {/* We can not determine an alt text on image */}
         <img
           src={`${asset.url}?h=${imgH}&fit=max`}
@@ -172,7 +174,12 @@ export default class Asset extends React.PureComponent {
             >
               <DialogContent size="medium" key={dialogType}>
                 <div className={styles.dialogContent}>
-                  <img src={`${asset.url}?w=200`} style={{maxWidth: '200px'}} />
+                  <img
+                    src={`${asset.url}?w=200`}
+                    style={{
+                      maxWidth: '200px'
+                    }}
+                  />
                   <WithReferringDocuments id={asset._id}>
                     {({isLoading, referringDocuments}) => {
                       const drafts = referringDocuments.reduce(
@@ -180,7 +187,6 @@ export default class Asset extends React.PureComponent {
                           doc._id.startsWith('drafts.') ? acc.concat(doc._id.slice(7)) : acc,
                         []
                       )
-
                       const filteredDocuments = referringDocuments.filter(
                         doc => !drafts.includes(doc._id)
                       )
@@ -215,7 +221,9 @@ export default class Asset extends React.PureComponent {
                                     <Item key={doc._id}>
                                       <IntentLink
                                         intent="edit"
-                                        params={{id: doc._id}}
+                                        params={{
+                                          id: doc._id
+                                        }}
                                         key={doc._id}
                                         className={styles.intentLink}
                                       >

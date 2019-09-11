@@ -1,14 +1,14 @@
-// @flow
 
-import type {Node} from 'react'
+
+/*:: import type {Node} from 'react'*/
 import React from 'react'
 import {FOCUS_TERMINATOR} from '@sanity/util/paths'
 import {Inline} from 'slate'
-import type {BlockContentFeatures, Type, Marker, Path, SlateEditor} from '../typeDefs'
+/*:: import type {BlockContentFeatures, Type, Marker, Path, SlateEditor} from '../typeDefs'*/
+
 import InvalidValue from '../../InvalidValueInput'
 import styles from './styles/Span.css'
-
-type Props = {
+/*:: type Props = {
   attributes: any,
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
@@ -18,21 +18,25 @@ type Props = {
   onFocus: Path => void,
   readOnly?: boolean,
   type: ?Type
-}
+}*/
 
-type State = {
+/*:: type State = {
   focusedAnnotationName: ?string
-}
+}*/
 
-export default class Span extends React.Component<Props, State> {
+export default class Span extends React.Component
+/*:: <Props, State>*/
+{
   static defaultProps = {
     readOnly: false
   }
-
   _clickCounter = 0
   _isMarkingText = false
 
-  constructor(props: Props) {
+  constructor(
+    props
+    /*: Props*/
+  ) {
     super(props)
     const focusedAnnotationName = this.props.node.data.get('focusedAnnotationName')
     this.state = {
@@ -44,21 +48,26 @@ export default class Span extends React.Component<Props, State> {
     return this.props.node.data.get('annotations')
   }
 
-  focusAnnotation(annotationName: string) {
+  focusAnnotation(
+    annotationName
+    /*: string*/
+  ) {
     const {node, editor} = this.props
-    this.setState({focusedAnnotationName: annotationName})
+    this.setState({
+      focusedAnnotationName: annotationName
+    })
+
     if (node.data.get('focusedAnnotationName') === annotationName) {
       return
     }
-    const data = {
-      ...node.data.toObject(),
-      focusedAnnotationName: annotationName
-    }
-    editor.setNodeByKey(node.key, {data})
-  }
 
-  // Open dialog when user clicks the node,
+    const data = {...node.data.toObject(), focusedAnnotationName: annotationName}
+    editor.setNodeByKey(node.key, {
+      data
+    })
+  } // Open dialog when user clicks the node,
   // but don't act on double clicks (mark text as normal)
+
   handleMouseDown = () => {
     const {readOnly} = this.props
     this._isMarkingText = true
@@ -70,17 +79,30 @@ export default class Span extends React.Component<Props, State> {
           this.startEditing()
         }
       }
+
       this._clickCounter = 0
     }, 200)
     this._clickCounter++
   }
-
-  handleInvalidValue = (event: PatchEvent) => {
+  handleInvalidValue = (
+    event
+    /*: PatchEvent*/
+  ) => {
     let _event = event
     const {editor, onPatch} = this.props
+
     const key = this.getFirstAnnotation()._key
+
     const parentBlock = editor.value.document.getClosestBlock(this.props.node.key)
-    const path = [{_key: parentBlock.key}, 'markDefs', {_key: key}]
+    const path = [
+      {
+        _key: parentBlock.key
+      },
+      'markDefs',
+      {
+        _key: key
+      }
+    ]
     path.reverse().forEach(part => {
       _event = _event.prefixAll(part)
     })
@@ -91,9 +113,13 @@ export default class Span extends React.Component<Props, State> {
     const {editor, node, onFocus} = this.props
     const block = editor.value.document.getClosestBlock(node.key)
     const focusPath = [
-      {_key: block.key},
+      {
+        _key: block.key
+      },
       'markDefs',
-      {_key: node.data.get('annotations')[this.state.focusedAnnotationName]._key},
+      {
+        _key: node.data.get('annotations')[this.state.focusedAnnotationName]._key
+      },
       FOCUS_TERMINATOR
     ]
     editor.blur()
@@ -105,34 +131,38 @@ export default class Span extends React.Component<Props, State> {
   handleView = () => {
     const {editor, node, onFocus} = this.props
     onFocus([
-      {_key: editor.value.document.getParent(node.key).key},
+      {
+        _key: editor.value.document.getParent(node.key).key
+      },
       'markDefs',
-      {_key: node.data.get('annotations')[this.state.focusedAnnotationName]._key},
+      {
+        _key: node.data.get('annotations')[this.state.focusedAnnotationName]._key
+      },
       FOCUS_TERMINATOR
     ])
   }
-
   handleMouseUp = () => {
     this._isMarkingText = false
   }
-
   handleInvalidTypeContainerClick = event => {
     event.preventDefault()
     event.stopPropagation()
   }
-
   handleClick = () => {
     const {type} = this.props
+
     if (!type) {
       return
-    }
-    // Don't do anyting if this type doesn't support any annotations.
+    } // Don't do anyting if this type doesn't support any annotations.
+
     if (!type.annotations || type.annotations.length === 0) {
       return
     }
-    const annotations = this.getAnnotations()
-    // Try to figure out which annotation that should be focused when user clicks the span
+
+    const annotations = this.getAnnotations() // Try to figure out which annotation that should be focused when user clicks the span
+
     let focusedAnnotationName
+
     if (type.annotations && type.annotations.length === 1) {
       // Only one annotation type, always focus this one
       focusedAnnotationName = type.annotations[0].name
@@ -140,10 +170,10 @@ export default class Span extends React.Component<Props, State> {
       // Only one annotation value, focus it
       focusedAnnotationName = annotations[Object.keys(annotations)[0]]._type
     }
+
     if (focusedAnnotationName) {
       this.focusAnnotation(focusedAnnotationName)
-    }
-    // If no focusedAnnotationName was found, buttons to edit respective annotations will be show
+    } // If no focusedAnnotationName was found, buttons to edit respective annotations will be show
   }
 
   getFirstAnnotation() {
@@ -163,10 +193,12 @@ export default class Span extends React.Component<Props, State> {
         annotation && annotation.blockEditor && annotation.blockEditor.render
           ? annotation.blockEditor.render
           : null
+
       if (CustomComponent) {
         children = <CustomComponent {...annotations[annotation.value]}>{children}</CustomComponent>
       }
     })
+
     if (annotationTypes.length === 0) {
       const firstAnnotation = this.getFirstAnnotation()
       return (
@@ -186,6 +218,7 @@ export default class Span extends React.Component<Props, State> {
         </span>
       )
     }
+
     const validation = markers.filter(marker => marker.type === 'validation')
     const errors = validation.filter(marker => marker.level === 'error')
     return (

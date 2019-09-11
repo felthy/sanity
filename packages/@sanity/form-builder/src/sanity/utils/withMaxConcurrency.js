@@ -1,4 +1,3 @@
-// @flow
 
 // Takes a observable-returning function and returns a new function that limits on the number of
 // concurrent observables.
@@ -7,36 +6,56 @@ import {Subject, Subscription, Observable, from as observableFrom} from 'rxjs'
 
 const DEFAULT_CONCURRENCY = 4
 
-function remove<T>(array: Array<T>, item: T): Array<T> {
+function remove(
+  /*:: <T>*/
+  array,
+  /*: Array<T>*/
+  item
+  /*: T*/
+) {
+  /*: Array<T>*/
   const index = array.indexOf(item)
+
   if (index > -1) {
     array.splice(index, 1)
   }
+
   return array
 }
 
 export function withMaxConcurrency(
-  func: any => Observable<*>,
-  concurrency: number = DEFAULT_CONCURRENCY
+  func,
+  /*: any => Observable<*>*/
+  /*: number*/
+  concurrency = DEFAULT_CONCURRENCY
 ) {
   const throttler = createThrottler(concurrency)
-  return (...args: Array<any>) => observableFrom(throttler(func(...args)))
+  return (...args) => observableFrom(throttler(func(...args)))
 }
-
-export function createThrottler(concurrency: number = DEFAULT_CONCURRENCY) {
-  const currentSubscriptions: Array<Subscription> = []
-  const pendingObservables: Array<Observable<*>> = []
+export function createThrottler(
+  /*: number*/
+  concurrency = DEFAULT_CONCURRENCY
+) {
+  const currentSubscriptions =
+    /*: Array<Subscription>*/
+    []
+  const pendingObservables =
+    /*: Array<Observable<*>>*/
+    []
   const ready$ = new Subject()
-
   return request
 
-  function request(observable: Observable<*>) {
+  function request(
+    observable
+    /*: Observable<*>*/
+  ) {
     return new Observable(observer => {
       if (currentSubscriptions.length >= concurrency) {
         return scheduleAndWait(observable)
           .pipe(mergeMap(request))
           .subscribe(observer)
       }
+
       const subscription = observable.subscribe(observer)
       currentSubscriptions.push(subscription)
       return () => {

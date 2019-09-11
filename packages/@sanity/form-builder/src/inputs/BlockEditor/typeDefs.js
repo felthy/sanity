@@ -1,7 +1,10 @@
-// @flow
-import type {List} from 'immutable'
-import type {Node, ComponentType, Element as ReactElement} from 'react'
-import type {
+
+
+/*:: import type {List} from 'immutable'*/
+
+/*:: import type {Node, ComponentType, Element as ReactElement} from 'react'*/
+
+/*:: import type {
   Change,
   Block as SlateBlock,
   Mark,
@@ -12,14 +15,14 @@ import type {
   Operation as _SlateOperation,
   Schema as _SlateSchema,
   Selection as _SlateSelection
-} from 'slate'
-import type {Patch as _Patch} from '../../typedefs/patch'
+} from 'slate'*/
+
+/*:: import type {Patch as _Patch} from '../../typedefs/patch'*/
 import {Path as _Path} from '../../typedefs/path'
 import {Marker as _Marker} from '../../typedefs'
+/*:: export type Patch = _Patch*/
 
-export type Patch = _Patch
-
-export type Type = {
+/*:: export type Type = {
   type: Type,
   name: string,
   title: string,
@@ -28,9 +31,9 @@ export type Type = {
   icon?: any,
   readOnly?: boolean,
   annotations?: {title: string, name: string}[]
-}
+}*/
 
-export type BlockArrayType = Type & {
+/*:: export type BlockArrayType = Type & {
   name: string,
   title: string,
   description: string,
@@ -41,48 +44,49 @@ export type BlockArrayType = Type & {
     layout?: 'grid'
   },
   of: Type[]
-}
+}*/
 
-export type Span = {
+/*:: export type Span = {
   _key: string,
   text: string,
   marks: string[]
-}
+}*/
 
-export type MarkDef = {_key: string, _type: string}
+/*:: export type MarkDef = {_key: string, _type: string}*/
 
-export type Block = {
+/*:: export type Block = {
   _type: string,
   _key: string,
   children: Span[],
   markDefs: MarkDef[]
-}
+}*/
 
-export type SlateNode = SlateBlock | Inline | Text | Mark
+/*:: export type SlateNode = SlateBlock | Inline | Text | Mark*/
 
-export type SlateMarkProps = {
+/*:: export type SlateMarkProps = {
   attributes: {},
   mark: {
     type: string
   },
   children: Node[]
-}
+}*/
 
-export type BlockItem = {
+/*:: export type BlockItem = {
   type: Type,
   title: string
-}
+}*/
 
-export type SlateValue = _SlateValue
-export type SlateOperation = _SlateOperation
+/*:: export type SlateValue = _SlateValue*/
 
-export type SlateChange = Change
+/*:: export type SlateOperation = _SlateOperation*/
 
-export type SlateEditor = _SlateEditor
+/*:: export type SlateChange = Change*/
 
-export type Annotation = any
+/*:: export type SlateEditor = _SlateEditor*/
 
-export type BlockContentFeature = {
+/*:: export type Annotation = any*/
+
+/*:: export type BlockContentFeature = {
   title: string,
   value: string,
   blockEditor?: {
@@ -90,9 +94,9 @@ export type BlockContentFeature = {
     render?: ComponentType<*>
   },
   type: Type
-}
+}*/
 
-export type BlockContentFeatures = {
+/*:: export type BlockContentFeatures = {
   decorators: BlockContentFeature[],
   styles: BlockContentFeature[],
   annotations: BlockContentFeature[],
@@ -104,9 +108,9 @@ export type BlockContentFeatures = {
     inlineObjects: Type[],
     blockObjects: Type[]
   }
-}
+}*/
 
-export type SlateComponentProps = {
+/*:: export type SlateComponentProps = {
   attributes?: {},
   children: Node[],
   editor: SlateEditor,
@@ -117,53 +121,53 @@ export type SlateComponentProps = {
   parent?: any,
   readOnly?: boolean,
   blockContentFeatures?: BlockContentFeatures
-}
+}*/
 
-export type Marker = _Marker
+/*:: export type Marker = _Marker*/
 
-export type Path = _Path
+/*:: export type Path = _Path*/
 
-export type SlateSchema = _SlateSchema
+/*:: export type SlateSchema = _SlateSchema*/
 
-export type SlateSelection = _SlateSelection
+/*:: export type SlateSelection = _SlateSelection*/
 
-export type FormBuilderValue =
+/*:: export type FormBuilderValue =
   | {
       _type?: string,
       _key: string,
       _ref?: string
     }
-  | Block
+  | Block*/
 
-export type FormBuilderSchema = {
+/*:: export type FormBuilderSchema = {
   name: string,
   types: Array<Type>
-}
+}*/
 
-export type UndoRedoStackItem = {
+/*:: export type UndoRedoStackItem = {
   operations: List<SlateOperation>,
   remoteOperations: List<SlateOperation>,
   beforeSelection: SlateSelection,
   afterSelection: SlateSelection
-}
+}*/
 
-export type UndoRedoStack = {undo: UndoRedoStackItem[], redo: UndoRedoStackItem[]}
+/*:: export type UndoRedoStack = {undo: UndoRedoStackItem[], redo: UndoRedoStackItem[]}*/
 
-export type RenderBlockActions = ({
+/*:: export type RenderBlockActions = ({
   block: FormBuilderValue,
   value: FormBuilderValue[],
   set: FormBuilderValue => void,
   unset: FormBuilderValue => void,
   insert: FormBuilderValue => void
-}) => Node | ReactElement<*>
+}) => Node | ReactElement<*>*/
 
-export type RenderCustomMarkers = (Marker[]) => Node | ReactElement<*>
+/*:: export type RenderCustomMarkers = (Marker[]) => Node | ReactElement<*>*/
 
-export type ChangeSet = {
+/*:: export type ChangeSet = {
   editorValue: SlateValue,
   isRemote: boolean,
   operations: List<SlateOperation>,
   patches: Patch[],
   selection: SlateSelection,
   callback: void => void
-}
+}*/

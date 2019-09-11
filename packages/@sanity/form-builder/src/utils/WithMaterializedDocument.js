@@ -1,30 +1,35 @@
-// @flow
-import React from 'react'
-import type {Node} from 'react'
-import type {ObservableI, Subscription} from '../typedefs/observable'
 
-type Props = {
+import React from 'react'
+/*:: import type {Node} from 'react'*/
+
+/*:: import type {ObservableI, Subscription} from '../typedefs/observable'*/
+
+/*:: type Props = {
   documentId: string,
   materialize: string => ObservableI<Object>,
   children: Object => null | Node
-}
+}*/
 
-type State = {
+/*:: type State = {
   materialized: ?Object
-}
+}*/
 
-export default class WithMaterializedDocument extends React.Component<Props, State> {
+export default class WithMaterializedDocument extends React.Component
+/*:: <Props, State>*/
+{
   state = {
     materialized: null
   }
-
-  subscription: ?Subscription
+  /*:: subscription: ?Subscription*/
 
   componentDidMount() {
     this.setDocId(this.props.documentId)
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(
+    nextProps
+    /*: Props*/
+  ) {
     if (this.props.documentId !== nextProps.documentId) {
       this.setDocId(nextProps.documentId)
     }
@@ -40,15 +45,24 @@ export default class WithMaterializedDocument extends React.Component<Props, Sta
     }
   }
 
-  setDocId(docId: string) {
+  setDocId(
+    docId
+    /*: string*/
+  ) {
     this.unsubscribe()
+
     if (!docId) {
-      this.setState({materialized: null})
+      this.setState({
+        materialized: null
+      })
       return
     }
-    this.subscription = this.props
-      .materialize(docId)
-      .subscribe(materialized => this.setState({materialized}))
+
+    this.subscription = this.props.materialize(docId).subscribe(materialized =>
+      this.setState({
+        materialized
+      })
+    )
   }
 
   render() {

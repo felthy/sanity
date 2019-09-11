@@ -8,33 +8,38 @@ const NOOP = () => {}
 
 function resolve(type, providedResolve = NOOP) {
   let itType = type
+
   while (itType) {
     const resolved = providedResolve(itType)
+
     if (resolved) {
       return resolved
     }
+
     itType = itType.type
   }
-  return undefined
-}
 
-// Memoize return values from a method that takes a single arg
+  return undefined
+} // Memoize return values from a method that takes a single arg
 // memoized as a map of argument => return value
+
 function memoizeMap(method) {
   const map = new WeakMap()
   return function memoizedMap(arg) {
     if (map.has(arg)) {
       return map.get(arg)
     }
+
     const val = method.call(this, arg)
+
     if (arg) {
       map.set(arg, val)
     }
+
     return val
   }
-}
+} // Memoize return value from method that takes no args
 
-// Memoize return value from method that takes no args
 function memoize(method) {
   let called = false
   let val
@@ -42,6 +47,7 @@ function memoize(method) {
     if (called) {
       return val
     }
+
     val = method.call(this)
     called = true
     return val
@@ -51,9 +57,11 @@ function memoize(method) {
 export default class FormBuilderContext extends React.Component {
   static createPatchChannel = () => {
     const channel = pubsub()
-    return {onPatch: channel.subscribe, receivePatches: channel.publish}
+    return {
+      onPatch: channel.subscribe,
+      receivePatches: channel.publish
+    }
   }
-
   static propTypes = {
     schema: PropTypes.object.isRequired,
     value: PropTypes.any,
@@ -65,7 +73,6 @@ export default class FormBuilderContext extends React.Component {
     resolveInputComponent: PropTypes.func.isRequired,
     resolvePreviewComponent: PropTypes.func.isRequired
   }
-
   static childContextTypes = {
     getValuePath: PropTypes.func,
     onPatch: PropTypes.func,
@@ -76,21 +83,17 @@ export default class FormBuilderContext extends React.Component {
       document: PropTypes.any
     })
   }
-
   getDocument = () => {
     return this.props.value
   }
-
   resolveInputComponent = memoizeMap(type => {
     const {resolveInputComponent} = this.props
     return resolve(type, resolveInputComponent) || fallbackInputs[type.jsonType]
   })
-
   resolvePreviewComponent = memoizeMap(type => {
     const {resolvePreviewComponent} = this.props
     return resolve(type, resolvePreviewComponent)
   })
-
   getChildContext = memoize(() => {
     const {schema, filterField, patchChannel} = this.props
     return {

@@ -1,11 +1,10 @@
-//@flow
 import PropTypes from 'prop-types'
 import React from 'react'
-import FormBuilderPropTypes from '../../FormBuilderPropTypes'
-import Field from './Field'
 import Fieldset from 'part:@sanity/components/fieldsets/default'
+import FormBuilderPropTypes from '../../FormBuilderPropTypes'
 import PatchEvent, {set, setIfMissing, unset} from '../../PatchEvent'
 import isEmpty from '../../utils/isEmpty'
+import Field from './Field'
 import UnknownFields from './UnknownFields'
 import fieldStyles from './styles/Field.css'
 
@@ -25,9 +24,8 @@ function getCollapsedWithDefaults(options = {}, level) {
       collapsible: level > 9,
       collapsed: level > 9
     }
-  }
+  } // default
 
-  // default
   return {
     collapsible: level > 2,
     collapsed: level > 2
@@ -48,9 +46,9 @@ export default class ObjectInput extends React.PureComponent {
     isRoot: PropTypes.bool,
     filterField: PropTypes.func
   }
-
   static defaultProps = {
     onChange() {},
+
     level: 0,
     focusPath: [],
     isRoot: false,
@@ -59,23 +57,35 @@ export default class ObjectInput extends React.PureComponent {
 
   handleBlur() {
     const {onChange, value} = this.props
+
     if (isEmpty(value)) {
       onChange(PatchEvent.from(unset()))
     }
   }
 
-  handleFieldChange = (fieldEvent: PatchEvent, field) => {
+  handleFieldChange = (
+    fieldEvent,
+    /*: PatchEvent*/
+    field
+  ) => {
     const {onChange, type, value, isRoot} = this.props
-
     let event = fieldEvent.prefixAll(field.name)
 
     if (!isRoot) {
-      event = event.prepend(setIfMissing(type.name === 'object' ? {} : {_type: type.name}))
+      event = event.prepend(
+        setIfMissing(
+          type.name === 'object'
+            ? {}
+            : {
+                _type: type.name
+              }
+        )
+      )
+
       if (value) {
         const valueTypeName = value && value._type
-        const schemaTypeName = type.name
+        const schemaTypeName = type.name // eslint-disable-next-line max-depth
 
-        // eslint-disable-next-line max-depth
         if (valueTypeName && schemaTypeName === 'object') {
           // The value has a _type key, but the type name from schema is 'object',
           // but _type: 'object' is implicit so we should fix it by removing it
@@ -87,6 +97,7 @@ export default class ObjectInput extends React.PureComponent {
         }
       }
     }
+
     onChange(event)
   }
 
@@ -119,12 +130,9 @@ export default class ObjectInput extends React.PureComponent {
   renderFieldset(fieldset, fieldsetIndex) {
     const {level, focusPath} = this.props
     const columns = fieldset.options && fieldset.options.columns
-
     const collapsibleOpts = getCollapsedWithDefaults(fieldset.options, level)
-
     const isExpanded =
       focusPath.length > 0 && fieldset.fields.some(field => focusPath[0] === field.name)
-
     return (
       <div key={fieldset.name} className={fieldStyles.root}>
         <Fieldset
@@ -160,6 +168,7 @@ export default class ObjectInput extends React.PureComponent {
 
   renderUnknownFields() {
     const {value, type, onChange, readOnly} = this.props
+
     if (!type.fields) {
       return null
     }
@@ -195,7 +204,6 @@ export default class ObjectInput extends React.PureComponent {
 
   render() {
     const {type, level, focusPath} = this.props
-
     const renderedFields = this.getRenderedFields()
     const renderedUnknownFields = this.renderUnknownFields()
 
@@ -210,9 +218,7 @@ export default class ObjectInput extends React.PureComponent {
 
     const collapsibleOpts = getCollapsedWithDefaults(type.options, level)
     const isExpanded = focusPath.length > 0
-
     const columns = type.options && type.options.columns
-
     return (
       <Fieldset
         level={level}

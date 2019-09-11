@@ -1,13 +1,12 @@
-//@flow
 import React from 'react'
 import {get} from 'lodash'
 import TextInput from 'part:@sanity/components/textinputs/default'
 import FormField from 'part:@sanity/components/formfields/default'
 import {getValidationRule} from '../utils/getValidationRule'
 import PatchEvent, {set, unset} from '../PatchEvent'
-import type {Type, Marker} from '../typedefs'
+/*:: import type {Type, Marker} from '../typedefs'*/
 
-type Props = {
+/*:: type Props = {
   type: Type,
   level: number,
   value: ?string,
@@ -15,12 +14,16 @@ type Props = {
   onChange: PatchEvent => void,
   onFocus: () => void,
   markers: Array<Marker>
-}
+}*/
 
-export default class UrlInput extends React.Component<Props> {
-  _input: ?TextInput
-
-  handleChange = (event: SyntheticEvent<HTMLInputElement>) => {
+export default class UrlInput extends React.Component
+/*:: <Props>*/
+{
+  /*:: _input: ?TextInput*/
+  handleChange = (
+    event
+    /*: SyntheticEvent<HTMLInputElement>*/
+  ) => {
     const value = event.currentTarget.value
     this.props.onChange(PatchEvent.from(value ? set(value) : unset()))
   }
@@ -31,19 +34,20 @@ export default class UrlInput extends React.Component<Props> {
     }
   }
 
-  setInput = (input: ?TextInput) => {
+  setInput = (
+    input
+    /*: ?TextInput*/
+  ) => {
     this._input = input
   }
 
   render() {
     const {value, markers, type, readOnly, level, onFocus} = this.props
     const validation = markers.filter(marker => marker.type === 'validation')
-    const errors = validation.filter(marker => marker.level === 'error')
+    const errors = validation.filter(marker => marker.level === 'error') // Use text input for relative URIs
 
-    // Use text input for relative URIs
     const uriRule = getValidationRule(type, 'uri')
     const inputType = uriRule && get(uriRule, 'constraint.options.allowRelative') ? 'text' : 'url'
-
     return (
       <FormField markers={markers} level={level} label={type.title} description={type.description}>
         <TextInput

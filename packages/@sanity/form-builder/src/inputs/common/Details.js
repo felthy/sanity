@@ -7,7 +7,6 @@ const ARROW_STYLE = {
   width: '1em',
   marginRight: '0.4em'
 }
-
 const CONTAINER_STYLE = {
   cursor: 'default',
   userSelect: 'none',
@@ -15,14 +14,12 @@ const CONTAINER_STYLE = {
   outline: 'none',
   marginBottom: '0.5em'
 }
-
 export default class Details extends React.Component {
   static propTypes = {
     children: PropTypes.node,
     isOpen: PropTypes.bool,
     title: PropTypes.node
   }
-
   static defaultProps = {
     title: 'Details',
     isOpen: false
@@ -36,7 +33,9 @@ export default class Details extends React.Component {
   }
 
   handleToggle = () => {
-    this.setState(prevState => ({isOpen: !prevState.isOpen}))
+    this.setState(prevState => ({
+      isOpen: !prevState.isOpen
+    }))
   }
 
   render() {

@@ -1,32 +1,51 @@
-// @flow
 
 import {randomKey} from '@sanity/block-tools'
-import type {SlateEditor} from '../typeDefs'
-import {Block} from 'slate'
+/*:: import type {SlateEditor} from '../typeDefs'*/
 
-type Options = {
+import {Block} from 'slate'
+/*:: type Options = {
   defaultBlock?: Block
-}
+}*/
 
 // This plugin inserts an empty default block after enter is pressed
 // within a block which is not a default block type.
 // I.e: when enter is pressed after a title, start a new empty normal block below
-
-export default function TextBlockOnEnterKeyPlugin(options: Options = {}) {
+export default function TextBlockOnEnterKeyPlugin(
+  /*: Options*/
+  options = {}
+) {
   const {defaultBlock} = options
+
   if (!defaultBlock) {
     throw new Error("Missing required option 'defaultBlock'")
   }
+
   return {
-    onKeyDown(event: SyntheticKeyboardEvent<*>, editor: SlateEditor, next: void => void) {
+    onKeyDown(
+      event,
+      /*: SyntheticKeyboardEvent<*>*/
+      editor,
+      /*: SlateEditor*/
+      next
+      /*: void => void*/
+    ) {
       const {key, shiftKey} = event
+
       if (key !== 'Enter' || shiftKey) {
         return next()
       }
+
       const {value} = editor
-      const isTextBlock = value.blocks.some((block: Block) => block.data.get('style'))
-      const isListNode = value.blocks.some((block: Block) => block.data.get('listItem'))
+      const isTextBlock = value.blocks.some((
+        block
+        /*: Block*/
+      ) => block.data.get('style'))
+      const isListNode = value.blocks.some((
+        block
+        /*: Block*/
+      ) => block.data.get('listItem'))
       const {startBlock} = value
+
       if (
         isListNode ||
         !isTextBlock ||
@@ -35,6 +54,7 @@ export default function TextBlockOnEnterKeyPlugin(options: Options = {}) {
       ) {
         return next()
       }
+
       const blocKey = randomKey(12)
       event.preventDefault()
       editor.insertBlock({

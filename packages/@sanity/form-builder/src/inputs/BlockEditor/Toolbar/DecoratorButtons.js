@@ -1,4 +1,3 @@
-// @flow
 
 import React from 'react'
 import {isEqual} from 'lodash'
@@ -9,35 +8,43 @@ import FormatUnderlinedIcon from 'part:@sanity/base/format-underlined-icon'
 import FormatCodeIcon from 'part:@sanity/base/format-code-icon'
 import SanityLogoIcon from 'part:@sanity/base/sanity-logo-icon'
 import ToggleButton from 'part:@sanity/components/toggles/button'
-import type {BlockContentFeature, BlockContentFeatures, SlateValue, SlateEditor} from '../typeDefs'
+/*:: import type {BlockContentFeature, BlockContentFeatures, SlateValue, SlateEditor} from '../typeDefs'*/
 
 import {keyMaps} from '../plugins/SetMarksOnKeyComboPlugin'
 import ToolbarClickAction from './ToolbarClickAction'
-
 import styles from './styles/DecoratorButtons.css'
 import CollapsibleButtonGroup from './CollapsibleButtonGroup'
+/*:: type DecoratorItem = BlockContentFeature & {active: boolean, disabled: boolean, icon: any}*/
 
-type DecoratorItem = BlockContentFeature & {active: boolean, disabled: boolean, icon: any}
-
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
   editorValue: SlateValue,
   collapsed: boolean
-}
+}*/
 
-function getIcon(type: string, schemaIcon: any) {
+function getIcon(
+  type,
+  /*: string*/
+  schemaIcon
+  /*: any*/
+) {
   switch (type) {
     case 'strong':
       return FormatBoldIcon
+
     case 'em':
       return FormatItalicIcon
+
     case 'underline':
       return FormatUnderlinedIcon
+
     case 'strike-through':
       return FormatStrikethroughIcon
+
     case 'code':
       return FormatCodeIcon
+
     default:
       return schemaIcon || SanityLogoIcon
   }
@@ -45,16 +52,24 @@ function getIcon(type: string, schemaIcon: any) {
 
 const NOOP = () => {}
 
-export default class DecoratorButtons extends React.Component<Props> {
-  shouldComponentUpdate(nextProps: Props) {
+export default class DecoratorButtons extends React.Component
+/*:: <Props>*/
+{
+  shouldComponentUpdate(
+    nextProps
+    /*: Props*/
+  ) {
     const nextMarks = nextProps.editorValue.marks.map(mrk => mrk.type)
     const currentMarks = this.props.editorValue.marks.map(mrk => mrk.type)
+
     if (nextProps.collapsed != this.props.collapsed) {
       return true
     }
+
     if (isEqual(nextMarks, currentMarks)) {
       return false
     }
+
     return true
   }
 
@@ -62,7 +77,7 @@ export default class DecoratorButtons extends React.Component<Props> {
     const {editor, blockContentFeatures} = this.props
     const {focusBlock} = editor.value
     const disabled = focusBlock ? editor.query('isVoid', focusBlock) : false
-    return blockContentFeatures.decorators.map<DecoratorItem>(decorator => ({
+    return blockContentFeatures.decorators.map(decorator => ({
       ...decorator,
       icon: getIcon(decorator.value, decorator.blockEditor && decorator.blockEditor.icon),
       active: editor.query('hasMark', decorator.value),
@@ -70,19 +85,25 @@ export default class DecoratorButtons extends React.Component<Props> {
     }))
   }
 
-  handleClick = (item: DecoratorItem) => {
+  handleClick = (
+    item
+    /*: DecoratorItem*/
+  ) => {
     const {editor} = this.props
     editor.toggleMark(item.value).focus()
   }
-
-  renderDecoratorButton = (item: DecoratorItem) => {
+  renderDecoratorButton = (
+    item
+    /*: DecoratorItem*/
+  ) => {
     const {editor} = this.props
     const icon = item.icon || (item.blockEditor && item.blockEditor.icon)
-    const Icon = icon || getIcon(item.value)
-    // We must not do a click-event here, because that messes with the editor focus!
+    const Icon = icon || getIcon(item.value) // We must not do a click-event here, because that messes with the editor focus!
+
     const onAction = () => {
       this.handleClick(item)
     }
+
     const shortCut = keyMaps[item.value] ? `(${keyMaps[item.value]})` : ''
     const title = `${item.title} ${shortCut}`
     return (
@@ -117,6 +138,7 @@ export default class DecoratorButtons extends React.Component<Props> {
         </CollapsibleButtonGroup>
       )
     }
+
     return <div className={styles.root}>{items.map(this.renderDecoratorButton)}</div>
   }
 }

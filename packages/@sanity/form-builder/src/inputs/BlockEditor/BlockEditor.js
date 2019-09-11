@@ -1,27 +1,21 @@
-// @flow
-import type {Element as ReactElement, ElementRef} from 'react'
+
+
+/*:: import type {Element as ReactElement, ElementRef} from 'react'*/
 import React from 'react'
 import {debounce} from 'lodash'
-
-import {PatchEvent} from 'part:@sanity/form-builder/patch-event'
-
 import ActivateOnFocus from 'part:@sanity/components/utilities/activate-on-focus'
 import {Portal} from 'part:@sanity/components/utilities/portal'
 import StackedEscapeable from 'part:@sanity/components/utilities/stacked-escapable'
-
 import Button from 'part:@sanity/components/buttons/default'
 import CloseIcon from 'part:@sanity/base/close-icon'
 import FullscreenIcon from 'part:@sanity/base/fullscreen-icon'
 import Spinner from 'part:@sanity/components/loading/spinner'
-
 import EditNode from './EditNode'
 import Editor from './Editor'
 import Toolbar from './Toolbar/Toolbar'
-
 import styles from './styles/BlockEditor.css'
 import IS_MAC from './utils/isMac'
-
-import type {
+/*:: import type {
   BlockContentFeatures,
   FormBuilderValue,
   Marker,
@@ -33,9 +27,9 @@ import type {
   SlateValue,
   Type,
   UndoRedoStack
-} from './typeDefs'
+} from './typeDefs'*/
 
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editorValue: SlateValue,
   fullscreen: boolean,
@@ -64,15 +58,22 @@ type Props = {
   value: ?(FormBuilderValue[]),
   undoRedoStack: UndoRedoStack,
   userIsWritingText: boolean
-}
+}*/
 
-type State = {
+/*:: type State = {
   preventScroll: boolean,
   isDragging: boolean
-}
+}*/
 
 // eslint-disable-next-line complexity
-function findEditNode(focusPath: Path, editorValue: SlateValue, editor: SlateEditor) {
+function findEditNode(
+  focusPath,
+  /*: Path*/
+  editorValue,
+  /*: SlateValue*/
+  editor
+  /*: SlateEditor*/
+) {
   const focusBlockKey = focusPath[0] && focusPath[0]._key
   const isVoidRootBlock =
     focusBlockKey &&
@@ -89,11 +90,14 @@ function findEditNode(focusPath: Path, editorValue: SlateValue, editor: SlateEdi
   const markDefKey =
     !isVoidRootBlock && focusPath[2] && focusPath[1] === 'markDefs' && focusPath[2]._key
   let key
+
   if (markDefKey) {
     const block = editorValue.document.getDescendant(focusBlockKey)
+
     if (!block) {
       return null
     }
+
     const span = block
       .filterDescendants(desc => desc.type === 'span')
       .find(node => {
@@ -108,24 +112,32 @@ function findEditNode(focusPath: Path, editorValue: SlateValue, editor: SlateEdi
   } else {
     key = focusBlockKey
   }
+
   return editorValue.document.getDescendant(key)
 }
 
-export default class BlockEditor extends React.PureComponent<Props, State> {
+export default class BlockEditor extends React.PureComponent
+/*:: <Props, State>*/
+{
   state = {
     preventScroll: false,
     isDragging: false
   }
-
   static defaultProps = {
     readOnly: false,
     onPaste: undefined,
     renderBlockActions: undefined,
     renderCustomMarkers: undefined
   }
-  scrollContainer: ElementRef<any> = React.createRef()
-  editor: ElementRef<any> = React.createRef()
-  editorWrapper: ElementRef<any> = React.createRef()
+  scrollContainer =
+    /*: ElementRef<any>*/
+    React.createRef()
+  editor =
+    /*: ElementRef<any>*/
+    React.createRef()
+  editorWrapper =
+    /*: ElementRef<any>*/
+    React.createRef()
 
   componentDidUpdate() {
     this.checkScrollHeight()
@@ -138,51 +150,94 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
   renderNodeEditor() {
     const {blockContentFeatures, editorValue, focusPath} = this.props
     const slateNode = findEditNode(focusPath, editorValue, this.getEditor())
+
     if (!slateNode || slateNode.type === 'contentBlock') {
       return null
     }
+
     let value
     let type
+
     if (slateNode.type === 'span') {
       const annotations = slateNode.data.get('annotations')
       const focusedAnnotationName = Object.keys(annotations).find(
         key => annotations[key]._key === focusPath[2]._key
       )
+
       if (!focusedAnnotationName) {
         return null
       }
+
       value = annotations[focusedAnnotationName]
       type = blockContentFeatures.annotations.find(an => an.value === focusedAnnotationName)
+
       if (type) {
         return this.renderEditNode(
           value,
           type.type,
-          [focusPath[0], 'markDefs', {_key: value._key}],
+          [
+            focusPath[0],
+            'markDefs',
+            {
+              _key: value._key
+            }
+          ],
           slateNode
         )
       }
     }
+
     value = slateNode.data.get('value')
+
     const findType = obj => obj.name === value._type
+
     if (slateNode.object === 'inline') {
       type = blockContentFeatures.types.inlineObjects.find(findType)
+
       if (type) {
         return this.renderEditNode(
           value,
           type,
-          [focusPath[0], 'children', {_key: value._key}],
+          [
+            focusPath[0],
+            'children',
+            {
+              _key: value._key
+            }
+          ],
           slateNode
         )
       }
     }
+
     type = blockContentFeatures.types.blockObjects.find(findType)
+
     if (type) {
-      return this.renderEditNode(value, type, [{_key: value._key}], slateNode)
+      return this.renderEditNode(
+        value,
+        type,
+        [
+          {
+            _key: value._key
+          }
+        ],
+        slateNode
+      )
     }
+
     return null
   }
 
-  renderEditNode(nodeValue: any, type: Type, path: Path, slateNode: SlateNode) {
+  renderEditNode(
+    nodeValue,
+    /*: any*/
+    type,
+    /*: Type*/
+    path,
+    /*: Path*/
+    slateNode
+    /*: SlateNode*/
+  ) {
     const {
       focusPath,
       fullscreen,
@@ -218,6 +273,7 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
     if (this.scrollContainer && this.scrollContainer.current && this.editorWrapper.current) {
       const preventScroll =
         this.scrollContainer.current.offsetHeight < this.editorWrapper.current.offsetHeight
+
       if (this.state.preventScroll !== preventScroll) {
         this.setState({
           preventScroll
@@ -230,18 +286,28 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
     if (this.editor && this.editor.current) {
       return this.editor.current.getEditor()
     }
+
     return null
   }
 
-  handleOnDragEnter = (event: SyntheticDragEvent<>) => {
-    this.setState({isDragging: true})
+  handleOnDragEnter = (
+    event
+    /*: SyntheticDragEvent<>*/
+  ) => {
+    this.setState({
+      isDragging: true
+    })
   }
-
-  handleOnDragLeave = debounce((event: SyntheticDragEvent<>) => {
-    this.setState({isDragging: false})
+  handleOnDragLeave = debounce((
+    event
+    /*: SyntheticDragEvent<>*/
+  ) => {
+    this.setState({
+      isDragging: false
+    })
   }, 1500)
 
-  renderEditor(): ReactElement<typeof Editor> {
+  renderEditor /*: ReactElement<typeof Editor>*/() {
     const {
       blockContentFeatures,
       editorValue,
@@ -295,9 +361,11 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
 
   renderReadOnlyFullscreenButton() {
     const {readOnly, fullscreen} = this.props
+
     if (!readOnly) {
       return null
     }
+
     return (
       <div className={styles.readOnlyFullscreenButtonContainer}>
         <Button
@@ -308,9 +376,8 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
         />
       </div>
     )
-  }
+  } // eslint-disable-next-line complexity
 
-  // eslint-disable-next-line complexity
   renderBlockEditor() {
     const {
       blockContentFeatures,
@@ -327,18 +394,14 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
       type,
       userIsWritingText
     } = this.props
-
     const isEditingNode = (focusPath || []).length > 1
-
     const hasMarkers = markers.filter(marker => marker.path.length > 0).length > 0
-
     const scrollContainerClassNames = [
       styles.scrollContainer,
       renderBlockActions || hasMarkers ? styles.hasBlockExtras : null
     ]
       .filter(Boolean)
       .join(' ')
-
     return (
       <div>
         {!readOnly && (
@@ -397,7 +460,10 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
     )
   }
 
-  handleToggleFullscreen = (event: SyntheticEvent<*>) => {
+  handleToggleFullscreen = (
+    event
+    /*: SyntheticEvent<*>*/
+  ) => {
     const {onToggleFullScreen} = this.props
     onToggleFullScreen(event)
   }

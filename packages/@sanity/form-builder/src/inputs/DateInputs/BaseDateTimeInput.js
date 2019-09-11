@@ -1,19 +1,21 @@
 /* eslint-disable complexity */
-// @flow
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import moment from 'moment'
-import type Moment from 'moment'
+/*:: import type Moment from 'moment'*/
+
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker-cssmodules.css' // eslint-disable-line import/no-unassigned-import
+
 import FormField from 'part:@sanity/components/formfields/default'
 import TextInput from 'part:@sanity/components/textinputs/default'
 import Button from 'part:@sanity/components/buttons/default'
 import CalendarIcon from 'part:@sanity/base/calendar-icon'
-import type {Marker} from '../../typedefs'
-import styles from './styles/BaseDateTimeInput.css'
+/*:: import type {Marker} from '../../typedefs'*/
 
-type Props = {
+import styles from './styles/BaseDateTimeInput.css'
+/*:: type Props = {
   value: ?Moment,
   markers: Array<Marker>,
   dateOnly?: boolean,
@@ -27,41 +29,52 @@ type Props = {
   readOnly: ?boolean,
   onChange: (?Moment) => void,
   level: number
-}
+}*/
 
 const getFormat = (dateFormat, timeFormat) => dateFormat + (timeFormat ? ` ${timeFormat}` : '')
-
-type State = {
+/*:: type State = {
   inputValue: ?string,
   isDialogOpen: boolean
-}
+}*/
 
-export default class BaseDateTimeInput extends React.Component<Props, State> {
-  _datepicker: ?DatePicker
-
+export default class BaseDateTimeInput extends React.Component
+/*:: <Props, State>*/
+{
+  /*:: _datepicker: ?DatePicker*/
   state = {
     inputValue: null,
     isDialogOpen: false
   }
-
-  handleInputChange = (event: SyntheticEvent<HTMLInputElement>) => {
+  handleInputChange = (
+    event
+    /*: SyntheticEvent<HTMLInputElement>*/
+  ) => {
     const inputValue = event.currentTarget.value
     const {onChange, dateFormat, timeFormat} = this.props
     const parsed = moment(inputValue, getFormat(dateFormat, timeFormat), true)
+
     if (parsed.isValid()) {
-      this.setState({inputValue: null})
+      this.setState({
+        inputValue: null
+      })
       onChange(parsed)
     } else {
-      this.setState({inputValue: inputValue})
+      this.setState({
+        inputValue: inputValue
+      })
     }
   }
-
-  handleDialogChange = (nextMoment?: Moment) => {
+  handleDialogChange = (
+    nextMoment
+    /*:: ?: Moment*/
+  ) => {
     const {onChange} = this.props
     onChange(nextMoment)
-    this.setState({inputValue: null, isDialogOpen: false})
+    this.setState({
+      inputValue: null,
+      isDialogOpen: false
+    })
   }
-
   handleSetNow = event => {
     this.handleDialogChange(moment())
   }
@@ -71,48 +84,49 @@ export default class BaseDateTimeInput extends React.Component<Props, State> {
       this._datepicker.input.focus()
     }
   }
-  setDatePicker = (datePicker: ?DatePicker) => {
+
+  setDatePicker = (
+    datePicker
+    /*: ?DatePicker*/
+  ) => {
     this._datepicker = datePicker
   }
-
   handleInputKeyDown = event => {
     if (event && event.key === 'Enter') {
       this.handleOpen()
     }
+
     return event
   }
-
   handleButtonClick = event => {
     this.focus()
     this.handleOpen()
   }
-
   handleOpen = event => {
     this.setState({
       isDialogOpen: true
     })
   }
-
   handleClose = () => {
     this.setState({
       isDialogOpen: false
     })
   }
-
   handleBlur = event => {
     this.handleClose()
-    this.setState({inputValue: null})
+    this.setState({
+      inputValue: null
+    })
+
     if (this.props.onBlur) {
       this.props.onBlur(event)
     }
   }
-
   handleFocus = event => {
     if (this.props.onFocus) {
       this.props.onFocus(event)
     }
   }
-
   renderPopperContainer = ({children}) => {
     const {isDialogOpen} = this.state
     return ReactDOM.createPortal(
@@ -135,15 +149,11 @@ export default class BaseDateTimeInput extends React.Component<Props, State> {
       timeStep,
       level
     } = this.props
-
     const {inputValue, isDialogOpen} = this.state
-
     const format = getFormat(dateFormat, timeFormat)
     const placeholder = this.props.placeholder || `e.g. ${moment().format(format)}`
-
     const validation = markers.filter(marker => marker.type === 'validation')
     const errors = validation.filter(marker => marker.level === 'error')
-
     return (
       <FormField markers={markers} label={title} level={level} description={description}>
         {readOnly && (
@@ -169,7 +179,9 @@ export default class BaseDateTimeInput extends React.Component<Props, State> {
                 calendarClassName={styles.datepicker}
                 popperClassName={styles.popper}
                 popperContainer={this.renderPopperContainer}
-                popperProps={{positionFixed: true}}
+                popperProps={{
+                  positionFixed: true
+                }}
                 className={styles.input}
                 onClickOutside={this.handleClose}
                 onChange={this.handleDialogChange}

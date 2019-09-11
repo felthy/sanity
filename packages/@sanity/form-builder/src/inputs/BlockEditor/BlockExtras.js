@@ -1,23 +1,24 @@
-// @flow
-import type {Node} from 'react'
+
+
+/*:: import type {Node} from 'react'*/
 import React from 'react'
 import classNames from 'classnames'
-
 import Markers from 'part:@sanity/form-builder/input/block-editor/block-markers'
+/*:: import type {Marker, SlateEditor, Path, RenderCustomMarkers} from './typeDefs'*/
 
-import type {Marker, SlateEditor, Path, RenderCustomMarkers} from './typeDefs'
 import styles from './styles/BlockExtras.css'
-
-type Props = {
+/*:: type Props = {
   blockActions?: Node,
   editor: SlateEditor,
   fullscreen: boolean,
   markers: Marker[],
   onFocus: Path => void,
   renderCustomMarkers?: RenderCustomMarkers
-}
+}*/
 
-export default class BlockExtras extends React.PureComponent<Props> {
+export default class BlockExtras extends React.PureComponent
+/*:: <Props>*/
+{
   static defaultProps = {
     blockActions: null,
     renderCustomMarkers: null
@@ -26,10 +27,11 @@ export default class BlockExtras extends React.PureComponent<Props> {
   getValidationMarkers() {
     const {markers} = this.props
     const validation = markers.filter(mrkr => mrkr.type === 'validation')
-    return validation.map<any>(mrkr => {
+    return validation.map(mrkr => {
       if (mrkr.path.length <= 1) {
         return mrkr
       }
+
       const level = mrkr.level === 'error' ? 'errors' : 'warnings'
       return {...mrkr, item: mrkr.item.cloneWithMessage(`Contains ${level}`)}
     })

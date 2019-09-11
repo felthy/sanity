@@ -10,10 +10,9 @@ function uploadSanityAsset(assetType, file, options = {}) {
   const extract = options.metadata
   const preserveFilename = options.storeOriginalFilename
   return observableFrom(hashFile(file)).pipe(
-    catchError(error =>
-      // ignore if hashing fails for some reason
-      observableOf(null)
-    ),
+    catchError((
+      error // ignore if hashing fails for some reason
+    ) => observableOf(null)),
     mergeMap(hash => (hash ? fetchExisting(`sanity.${assetType}Asset`, hash) : observableOf(null))),
     mergeMap(existing => {
       if (existing) {
@@ -24,27 +23,31 @@ function uploadSanityAsset(assetType, file, options = {}) {
           asset: existing
         })
       }
-      return client.observable.assets.upload(assetType, file, {extract, preserveFilename}).pipe(
-        map(event =>
-          event.type === 'response'
-            ? {
-                // rewrite to a 'complete' event
-                type: 'complete',
-                id: event.body.document._id,
-                asset: event.body.document
-              }
-            : event
+
+      return client.observable.assets
+        .upload(assetType, file, {
+          extract,
+          preserveFilename
+        })
+        .pipe(
+          map(event =>
+            event.type === 'response'
+              ? {
+                  // rewrite to a 'complete' event
+                  type: 'complete',
+                  id: event.body.document._id,
+                  asset: event.body.document
+                }
+              : event
+          )
         )
-      )
     })
   )
 }
 
 const uploadAsset = withMaxConcurrency(uploadSanityAsset, MAX_CONCURRENT_UPLOADS)
-
 export const uploadImageAsset = (file, options) => uploadAsset('image', file, options)
 export const uploadFileAsset = (file, options) => uploadAsset('file', file, options)
-
 export function materializeReference(id) {
   return observePaths(id, ['originalFilename', 'url', 'metadata'])
 }
@@ -59,7 +62,9 @@ function fetchExisting(type, hash) {
 function readFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
+
     reader.onload = () => resolve(reader.result)
+
     reader.onerror = reject
     reader.readAsArrayBuffer(file)
   })
@@ -69,6 +74,7 @@ function hashFile(file) {
   if (!window.crypto || !window.crypto.subtle || !window.FileReader) {
     return Promise.resolve(null)
   }
+
   return readFile(file)
     .then(arrayBuffer => crypto.subtle.digest('SHA-1', arrayBuffer))
     .then(hexFromBuffer)

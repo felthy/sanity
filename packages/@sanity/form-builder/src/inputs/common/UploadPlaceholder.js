@@ -1,15 +1,16 @@
 // eslint-disable max-len
-// @flow
+
 import React from 'react'
 import PropTypes from 'prop-types'
-import styles from './styles/UploadPlaceholder.css'
 import PasteIcon from 'part:@sanity/base/paste-icon'
 import UploadIcon from 'part:@sanity/base/upload-icon'
+import styles from './styles/UploadPlaceholder.css'
 
 export default class UploadPlaceholder extends React.PureComponent {
   static propTypes = {
     hasFocus: PropTypes.bool
   }
+
   render() {
     const {hasFocus} = this.props
     return (

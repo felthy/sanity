@@ -1,48 +1,45 @@
-// @flow
+
+
 /* eslint-disable complexity */
 
-import type {Node} from 'react'
+/*:: import type {Node} from 'react'*/
 import React from 'react'
 import LinkIcon from 'part:@sanity/base/link-icon'
-
 import EditItemFold from 'part:@sanity/components/edititem/fold'
 import Popover from 'part:@sanity/components/dialogs/popover'
 import FullscreenDialog from 'part:@sanity/components/dialogs/fullscreen'
 import DefaultDialog from 'part:@sanity/components/dialogs/default'
 import DialogContent from 'part:@sanity/components/dialogs/content'
 import ValidationStatus from 'part:@sanity/components/validation/status'
-
 import {createDragHandle} from 'part:@sanity/components/lists/sortable'
 import {IntentLink} from 'part:@sanity/base/router'
 import DragBarsIcon from 'part:@sanity/base/bars-icon'
+import * as PathUtils from '@sanity/util/paths'
 import {FormBuilderInput} from '../../FormBuilderInput'
 import PatchEvent from '../../PatchEvent'
 import Preview from '../../Preview'
-
 import {resolveTypeName} from '../../utils/resolveTypeName'
-import type {Path} from '../../typedefs/path'
-import type {Marker, Type} from '../../typedefs'
-import * as PathUtils from '@sanity/util/paths'
+/*:: import type {Path} from '../../typedefs/path'*/
+
+/*:: import type {Marker, Type} from '../../typedefs'*/
+
 import ConfirmButton from './ConfirmButton'
 import styles from './styles/ItemValue.css'
-import type {ArrayType, ItemValue} from './typedefs'
+/*:: import type {ArrayType, ItemValue} from './typedefs'*/
 
 const DragHandle = createDragHandle(() => (
   <span className={styles.dragHandle}>
     <DragBarsIcon />
   </span>
 ))
-
 const CLOSE_ACTION = {
   name: 'close',
   title: 'Close'
 }
-
 const CANCEL_ACTION = {
   name: 'close',
   title: 'Cancel'
 }
-
 const DELETE_ACTION = {
   name: 'delete',
   title: 'Delete',
@@ -50,8 +47,7 @@ const DELETE_ACTION = {
   inverted: true,
   secondary: true
 }
-
-type Props = {
+/*:: type Props = {
   type: ArrayType,
   value: ItemValue,
   level: number,
@@ -63,10 +59,12 @@ type Props = {
   onBlur: void => void,
   readOnly: ?boolean,
   focusPath: Path
-}
+}*/
 
 function pathSegmentFrom(value) {
-  return {_key: value._key}
+  return {
+    _key: value._key
+  }
 }
 
 function hasFocusInPath(path, value) {
@@ -79,9 +77,10 @@ function isEmpty(value) {
   return Object.keys(value).every(key => IGNORE_KEYS.includes(key))
 }
 
-export default class RenderItemValue extends React.Component<Props> {
-  _focusArea: ?FocusArea
-
+export default class RenderItemValue extends React.Component
+/*:: <Props>*/
+{
+  /*:: _focusArea: ?FocusArea*/
   static defaultProps = {
     level: 0,
     markers: []
@@ -89,6 +88,7 @@ export default class RenderItemValue extends React.Component<Props> {
 
   componentDidMount() {
     const {focusPath, value} = this.props
+
     if (value._key && hasFocusInPath(focusPath, value)) {
       this.focus()
     }
@@ -97,6 +97,7 @@ export default class RenderItemValue extends React.Component<Props> {
   componentDidUpdate(prevProps) {
     const hadFocus = hasFocusInPath(prevProps.focusPath, prevProps.value)
     const hasFocus = hasFocusInPath(this.props.focusPath, this.props.value)
+
     if (!hadFocus && hasFocus) {
       this.focus()
     }
@@ -105,11 +106,9 @@ export default class RenderItemValue extends React.Component<Props> {
   handleEditStart = event => {
     this.setFocus([PathUtils.FOCUS_TERMINATOR])
   }
-
   handleFocus = () => {
     this.setFocus()
   }
-
   handleEditStop = () => {
     if (isEmpty(this.props.value)) {
       this.handleRemove()
@@ -117,33 +116,44 @@ export default class RenderItemValue extends React.Component<Props> {
       this.setFocus()
     }
   }
-
-  handleKeyPress = (event: SyntheticKeyboardEvent<*>) => {
+  handleKeyPress = (
+    event
+    /*: SyntheticKeyboardEvent<*>*/
+  ) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       this.setFocus([PathUtils.FOCUS_TERMINATOR])
     }
   }
-
   handleRemove = () => {
     const {onRemove, value} = this.props
     onRemove(value)
   }
-
-  handleChange = (event: PatchEvent) => {
+  handleChange = (
+    event
+    /*: PatchEvent*/
+  ) => {
     const {onChange, value} = this.props
     onChange(event, value)
   }
 
-  getMemberType(): ?Type {
+  getMemberType /*: ?Type*/() {
     const {value, type} = this.props
     const itemTypeName = resolveTypeName(value)
     return type.of.find(memberType => memberType.name === itemTypeName)
   }
 
-  setFocus(path: Path = []) {
+  setFocus(
+    /*: Path*/
+    path = []
+  ) {
     const {value, onFocus} = this.props
-    onFocus([{_key: value._key}, ...path])
+    onFocus([
+      {
+        _key: value._key
+      },
+      ...path
+    ])
   }
 
   focus() {
@@ -152,14 +162,17 @@ export default class RenderItemValue extends React.Component<Props> {
     }
   }
 
-  setFocusArea = (el: ?FocusArea) => {
+  setFocusArea = (
+    el
+    /*: ?FocusArea*/
+  ) => {
     this._focusArea = el
   }
-
   handleDialogAction = action => {
     if (action.name === 'close') {
       this.handleEditStop()
     }
+
     if (action.name === 'delete') {
       // Needs a proper confirm dialog later
       // eslint-disable-next-line no-alert
@@ -169,13 +182,14 @@ export default class RenderItemValue extends React.Component<Props> {
     }
   }
 
-  renderEditItemForm(item: ItemValue): Node {
+  renderEditItemForm(
+    item /*: Node*/
+    /*: ItemValue*/
+  ) {
     const {type, markers, focusPath, onFocus, onBlur, readOnly, filterField} = this.props
     const options = type.options || {}
-
     const memberType = this.getMemberType() || {}
     const childMarkers = markers.filter(marker => marker.path.length > 1)
-
     const content = (
       <FormBuilderInput
         type={memberType}
@@ -187,12 +201,14 @@ export default class RenderItemValue extends React.Component<Props> {
         focusPath={focusPath}
         readOnly={readOnly || memberType.readOnly}
         markers={childMarkers}
-        path={[{_key: item._key}]}
+        path={[
+          {
+            _key: item._key
+          }
+        ]}
         filterField={filterField}
       />
-    )
-
-    // test focus issues by uncommenting the next line
+    ) // test focus issues by uncommenting the next line
     // return content
 
     const title = readOnly || memberType.readOnly ? memberType.title : `Edit ${memberType.title}`
@@ -279,7 +295,6 @@ export default class RenderItemValue extends React.Component<Props> {
     ]
       .filter(Boolean)
       .join(' ')
-
     return (
       <div className={classNames}>
         {!isGrid && isSortable && <DragHandle />}
@@ -305,7 +320,13 @@ export default class RenderItemValue extends React.Component<Props> {
             <ValidationStatus markers={scopedValidation} />
           </div>
           {value._ref && (
-            <IntentLink className={styles.linkToReference} intent="edit" params={{id: value._ref}}>
+            <IntentLink
+              className={styles.linkToReference}
+              intent="edit"
+              params={{
+                id: value._ref
+              }}
+            >
               <LinkIcon />
             </IntentLink>
           )}
@@ -317,11 +338,9 @@ export default class RenderItemValue extends React.Component<Props> {
 
   render() {
     const {value, focusPath, type} = this.props
-
     const options = type.options || {}
     const isGrid = options.layout === 'grid'
     const isExpanded = PathUtils.isExpanded(value, focusPath)
-
     return (
       <div className={isGrid ? styles.gridItem : styles.listItem}>
         {this.renderItem()}

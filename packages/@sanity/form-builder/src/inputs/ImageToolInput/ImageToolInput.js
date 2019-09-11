@@ -1,47 +1,45 @@
-// @flow
+
 import React from 'react'
+/*:: import type {Type} from '../../typedefs'*/
 
-import type {Type} from '../../typedefs'
-import PatchEvent, {set} from '../../PatchEvent'
 import Fieldset from 'part:@sanity/components/fieldsets/default'
-
 import ImageTool from '@sanity/imagetool'
 import HotspotImage from '@sanity/imagetool/HotspotImage'
 import ImageLoader from 'part:@sanity/components/utilities/image-loader'
 import {DEFAULT_CROP, DEFAULT_HOTSPOT} from '@sanity/imagetool/constants'
+import PatchEvent, {set} from '../../PatchEvent'
 import styles from './styles/ImageToolInput.css'
-
-type Hotspot = {
+/*:: type Hotspot = {
   x: number,
   y: number,
   height: number,
   width: number
-}
+}*/
 
-type Crop = {
+/*:: type Crop = {
   left: number,
   right: number,
   top: number,
   bottom: number
-}
+}*/
 
-type Value = {
+/*:: type Value = {
   hotspot?: Hotspot,
   crop?: Crop
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   imageUrl: string,
   value?: Value,
   onChange: PatchEvent => void,
   readOnly: ?boolean,
   level: number,
   type: Type
-}
+}*/
 
-type State = {
+/*:: type State = {
   value?: Value // cache value for moar fps
-}
+}*/
 
 const PREVIEW_ASPECT_RATIOS = [
   ['Portrait', 9 / 16],
@@ -49,8 +47,9 @@ const PREVIEW_ASPECT_RATIOS = [
   ['Landscape', 16 / 9],
   ['Panorama', 4]
 ]
-
-export default class ImageToolInput extends React.Component<Props, State> {
+export default class ImageToolInput extends React.Component
+/*:: <Props, State>*/
+{
   constructor(props) {
     super()
     this.state = {
@@ -60,9 +59,8 @@ export default class ImageToolInput extends React.Component<Props, State> {
 
   handleChangeEnd = () => {
     const {onChange, readOnly, type} = this.props
-    const {value} = this.state
+    const {value} = this.state // For backwards compatibility, where hotspot/crop might not have a named type yet
 
-    // For backwards compatibility, where hotspot/crop might not have a named type yet
     const cropField = type.fields.find(
       field => field.name === 'crop' && field.type.name !== 'object'
     )
@@ -71,28 +69,43 @@ export default class ImageToolInput extends React.Component<Props, State> {
     )
 
     if (!readOnly) {
-      const crop = cropField ? {_type: cropField.type.name, ...value.crop} : value.crop
+      const crop = cropField
+        ? {
+            _type: cropField.type.name,
+            ...value.crop
+          }
+        : value.crop
       const hotspot = hotspotField
-        ? {_type: hotspotField.type.name, ...value.hotspot}
+        ? {
+            _type: hotspotField.type.name,
+            ...value.hotspot
+          }
         : value.hotspot
       onChange(PatchEvent.from([set(crop, ['crop']), set(hotspot, ['hotspot'])]))
     }
 
-    this.setState({value: this.props.value})
+    this.setState({
+      value: this.props.value
+    })
   }
-
-  handleChange = (nextValue: Value) => {
-    this.setState({value: nextValue})
+  handleChange = (
+    nextValue
+    /*: Value*/
+  ) => {
+    this.setState({
+      value: nextValue
+    })
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({value: nextProps.value})
+    this.setState({
+      value: nextProps.value
+    })
   }
 
   render() {
     const {imageUrl, level, readOnly} = this.props
     const {value} = this.state
-
     return (
       <div className={styles.root}>
         <Fieldset legend="Hotspot and crop" level={level}>

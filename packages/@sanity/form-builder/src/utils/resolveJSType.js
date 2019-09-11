@@ -1,20 +1,25 @@
-const toString = Object.prototype.toString
-// Copied from https://github.com/ForbesLindesay/type-of, but inlined to have fine grained control
+const toString = Object.prototype.toString // Copied from https://github.com/ForbesLindesay/type-of, but inlined to have fine grained control
 
 export function resolveJSType(val) {
   switch (toString.call(val)) {
     case '[object Function]':
       return 'function'
+
     case '[object Date]':
       return 'date'
+
     case '[object RegExp]':
       return 'regexp'
+
     case '[object Arguments]':
       return 'arguments'
+
     case '[object Array]':
       return 'array'
+
     case '[object String]':
       return 'string'
+
     default:
   }
 

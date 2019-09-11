@@ -1,8 +1,6 @@
-// @flow
 
 import React from 'react'
 import {get, isEqual} from 'lodash'
-
 import DefaultDialog from 'part:@sanity/components/dialogs/default'
 import DialogContent from 'part:@sanity/components/dialogs/content'
 import FullscreenDialog from 'part:@sanity/components/dialogs/fullscreen'
@@ -13,12 +11,10 @@ import Escapable from 'part:@sanity/components/utilities/escapable'
 import {findDOMNode} from 'slate-react'
 import {FormBuilderInput} from '../../FormBuilderInput'
 import {set, PatchEvent} from '../../PatchEvent'
-
-import type {Block, Marker, Path, Type, SlateNode, FormBuilderValue, SlateEditor} from './typeDefs'
+/*:: import type {Block, Marker, Path, Type, SlateNode, FormBuilderValue, SlateEditor} from './typeDefs'*/
 
 import styles from './styles/EditNode.css'
-
-type Props = {
+/*:: type Props = {
   editor: SlateEditor,
   focusPath: Path,
   fullscreen: boolean,
@@ -31,13 +27,18 @@ type Props = {
   readOnly?: boolean,
   type: Type,
   value: ?(FormBuilderValue[])
-}
+}*/
 
-export default class EditNode extends React.Component<Props> {
+export default class EditNode extends React.Component
+/*:: <Props>*/
+{
   static defaultProps = {
     readOnly: false
   }
-  handleChange = (patchEvent: PatchEvent) => {
+  handleChange = (
+    patchEvent
+    /*: PatchEvent*/
+  ) => {
     const {onPatch, path, value, onFocus, focusPath} = this.props
     let _patchEvent = patchEvent
     path
@@ -45,38 +46,44 @@ export default class EditNode extends React.Component<Props> {
       .reverse()
       .forEach(segment => {
         _patchEvent = _patchEvent.prefixAll(segment)
-      })
-    // Intercept patches that unsets markDefs.
+      }) // Intercept patches that unsets markDefs.
     // The child using the markDef must have that mark removed,
     // so insert patches that rewrite that block without the mark
+
     _patchEvent.patches.forEach((patch, index) => {
       if (patch.path.length === 3 && patch.path[1] === 'markDefs' && patch.type === 'unset') {
         const block = value && value.find(blk => blk._key === patch.path[0]._key)
         const _block = {...block}
         const markKey = patch.path[2]._key
+
         _block.children.forEach(child => {
           if (child.marks) {
             child.marks = child.marks.filter(mark => mark !== markKey)
           }
         })
-        const blockPath = [{_key: _block._key}]
+
+        const blockPath = [
+          {
+            _key: _block._key
+          }
+        ]
         _block.markDefs = _block.markDefs.filter(def => def._key !== markKey)
-        _patchEvent.patches.splice(index + 1, 0, set(_block, blockPath))
-        // Set focus away from the annotation, and to the block itself
+
+        _patchEvent.patches.splice(index + 1, 0, set(_block, blockPath)) // Set focus away from the annotation, and to the block itself
+
         if (focusPath && isEqual(patch.path, focusPath.slice(0, patch.path.length))) {
           onFocus(blockPath)
         }
       }
     })
+
     onPatch(_patchEvent)
   }
-
   handleClose = () => {
     const {focusPath, onFocus, editor} = this.props
     onFocus(focusPath.slice(0, 1))
     editor.command('focusNoScroll')
   }
-
   handleDialogAction = () => {
     // NOOP
   }
@@ -113,6 +120,7 @@ export default class EditNode extends React.Component<Props> {
         </FullscreenDialog>
       )
     }
+
     if (editModalLayout === 'fold') {
       return (
         <div className={styles.editBlockContainerFold}>
@@ -122,6 +130,7 @@ export default class EditNode extends React.Component<Props> {
         </div>
       )
     }
+
     if (editModalLayout === 'popover') {
       return (
         <Popover
@@ -139,6 +148,7 @@ export default class EditNode extends React.Component<Props> {
         </Popover>
       )
     }
+
     return (
       <DefaultDialog
         isOpen
@@ -154,9 +164,11 @@ export default class EditNode extends React.Component<Props> {
 
   render() {
     const {nodeValue, fullscreen} = this.props
+
     if (!nodeValue) {
       return <div classNames={styles.root}>No value???</div>
     }
+
     return (
       <div className={[styles.root, fullscreen ? styles.fullscreen : null].join(' ')}>
         <Stacked>

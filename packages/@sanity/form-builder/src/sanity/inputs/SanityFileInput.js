@@ -9,9 +9,11 @@ export default class SanityFileInput extends React.Component {
       this._input.focus()
     }
   }
+
   setInput = input => {
     this._input = input
   }
+
   render() {
     return (
       <FileInput

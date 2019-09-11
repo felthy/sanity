@@ -1,12 +1,20 @@
-// @flow
-import accept from 'attr-accept'
-import uploaders from './uploaders'
-import {get} from 'lodash'
-import type {Uploader} from './typedefs'
-import type {Type} from '../../typedefs'
-import * as is from '../../utils/is'
 
-export default function resolveUploader(type: Type, file: File): ?Uploader {
+import accept from 'attr-accept'
+import {get} from 'lodash'
+/*:: import type {Uploader} from './typedefs'*/
+
+/*:: import type {Type} from '../../typedefs'*/
+
+import * as is from '../../utils/is'
+import uploaders from './uploaders'
+
+export default function resolveUploader(
+  type,
+  /*: Type*/
+  file
+  /*: File*/
+) {
+  /*: ?Uploader*/
   return uploaders.find(uploader => {
     return (
       is.type(uploader.type, type) &&

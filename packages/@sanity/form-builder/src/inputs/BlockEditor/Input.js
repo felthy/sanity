@@ -1,16 +1,11 @@
-// @flow
 
-import type {ElementRef} from 'react'
 
+/*:: import type {ElementRef} from 'react'*/
 import {uniqueId} from 'lodash'
-
 import React from 'react'
-
 import FormField from 'part:@sanity/components/formfields/default'
-
 import {PatchEvent} from '../../PatchEvent'
-
-import type {
+/*:: import type {
   BlockArrayType,
   BlockContentFeatures,
   FormBuilderValue,
@@ -22,13 +17,11 @@ import type {
   SlateValue,
   Type,
   UndoRedoStack
-} from './typeDefs'
+} from './typeDefs'*/
 
 import BlockEditor from './BlockEditor'
-
 import styles from './styles/Input.css'
-
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   controller: SlateEditor,
   editorValue: SlateValue,
@@ -54,13 +47,15 @@ type Props = {
   undoRedoStack: UndoRedoStack,
   value: ?(FormBuilderValue[]),
   userIsWritingText: boolean
-}
+}*/
 
-type State = {
+/*:: type State = {
   fullscreen: boolean
-}
+}*/
 
-export default class BlockEditorInput extends React.Component<Props, State> {
+export default class BlockEditorInput extends React.Component
+/*:: <Props, State>*/
+{
   static defaultProps = {
     readOnly: false,
     renderBlockActions: undefined,
@@ -68,33 +63,44 @@ export default class BlockEditorInput extends React.Component<Props, State> {
     onPaste: undefined
   }
   inputId = uniqueId('BlockEditor')
-  blockEditor: ElementRef<any> = React.createRef()
-
+  blockEditor =
+    /*: ElementRef<any>*/
+    React.createRef()
   state = {
     fullscreen: false
   }
-
-  handleToggleFullScreen = (event?: SyntheticEvent<*>) => {
-    this.setState((prevState: State) => ({fullscreen: !prevState.fullscreen}))
+  handleToggleFullScreen = (
+    event
+    /*:: ?: SyntheticEvent<*>*/
+  ) => {
+    this.setState((
+      prevState
+      /*: State*/
+    ) => ({
+      fullscreen: !prevState.fullscreen
+    }))
     window.requestAnimationFrame(() => {
       this.focus()
     })
   }
-
   focus = () => {
     const {onFocus, readOnly} = this.props
     const blockEditor = this.blockEditor && this.blockEditor.current
     const editor = blockEditor && blockEditor.getEditor()
+
     if (editor && !readOnly) {
       editor.command('ensurePlaceHolderBlock')
       editor.focus()
       const key = editor.value.focusBlock
         ? editor.value.focusBlock.key
         : editor.value.document.nodes.get(0).key
-      onFocus([{_key: key}])
+      onFocus([
+        {
+          _key: key
+        }
+      ])
     }
   }
-
   handleFocusSkipper = () => {
     this.focus()
   }
@@ -122,11 +128,8 @@ export default class BlockEditorInput extends React.Component<Props, State> {
       userIsWritingText,
       value
     } = this.props
-
     const {fullscreen} = this.state
-
     const isActive = Array.isArray(focusPath) && focusPath.length >= 1
-
     return (
       <div>
         <FormField

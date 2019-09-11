@@ -1,6 +1,6 @@
-// @flow
-import type {ElementRef} from 'react'
 
+
+/*:: import type {ElementRef} from 'react'*/
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SoftBreakPlugin from 'slate-soft-break'
@@ -8,12 +8,11 @@ import {findDOMNode, Editor as SlateReactEditor, getEventTransfer} from 'slate-r
 import {isEqual} from 'lodash'
 import {isKeyHotkey} from 'is-hotkey'
 import insertBlockOnEnter from 'slate-insert-block-on-enter'
-
 import onPasteFromPart from 'part:@sanity/form-builder/input/block-editor/on-paste?'
 import onCopy from 'part:@sanity/form-builder/input/block-editor/on-copy?'
-
-import PatchEvent, {insert, set, setIfMissing} from '../../../PatchEvent'
-import type {
+import {EDITOR_DEFAULT_BLOCK_TYPE, editorValueToBlocks} from '@sanity/block-tools'
+import PatchEvent, {insert, set, setIfMissing} from '../../PatchEvent'
+/*:: import type {
   BlockContentFeatures,
   FormBuilderValue,
   Marker,
@@ -28,11 +27,10 @@ import type {
   SlateValue,
   Type,
   UndoRedoStack
-} from './typeDefs'
+} from './typeDefs'*/
 
 import {VALUE_TO_JSON_OPTS} from './utils/createOperationToPatches'
 import buildEditorSchema from './utils/buildEditorSchema'
-
 import ExpandToWordPlugin from './plugins/ExpandToWordPlugin'
 import EnsurePlaceHolderBlockPlugin from './plugins/EnsurePlaceHolderBlockPlugin'
 import InsertBlockObjectPlugin from './plugins/InsertBlockObjectPlugin'
@@ -55,28 +53,27 @@ import FireFoxVoidNodePlugin from './plugins/FirefoxVoidNodePlugin'
 import FocusNoScrollPlugin from './plugins/FocusNoScrollPlugin'
 import ScrollAbsoluteTopBottomPlugin from './plugins/ScrollAbsoluteTopBottomPlugin'
 import ScrollToFocusWithDynamicHeightPreviewPlugin from './plugins/ScrollToFocusWithDynamicHeightPreviewPlugin'
-
 import BlockExtrasOverlay from './BlockExtrasOverlay'
 import BlockObject from './nodes/BlockObject'
 import ContentBlock from './nodes/ContentBlock'
 import Decorator from './nodes/Decorator'
 import InlineObject from './nodes/InlineObject'
 import Span from './nodes/Span'
-
 import styles from './styles/Editor.css'
-import {EDITOR_DEFAULT_BLOCK_TYPE, editorValueToBlocks} from '@sanity/block-tools'
+/*:: type PasteProgressResult = {status: string | null, error?: Error}*/
 
-type PasteProgressResult = {status: string | null, error?: Error}
-type OnPasteResult = ?({insert?: FormBuilderValue[], path?: []} | Error)
-type OnPasteResultOrPromise = ?(OnPasteResult | Promise<OnPasteResult>)
-type OnPasteFn = ({
+/*:: type OnPasteResult = ?({insert?: FormBuilderValue[], path?: []} | Error)*/
+
+/*:: type OnPasteResultOrPromise = ?(OnPasteResult | Promise<OnPasteResult>)*/
+
+/*:: type OnPasteFn = ({
   event: SyntheticEvent<>,
   path: [],
   type: Type,
   value: ?(FormBuilderValue[])
-}) => OnPasteResultOrPromise
+}) => OnPasteResultOrPromise*/
 
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editorValue: SlateValue,
   focusPath: Path,
@@ -99,10 +96,15 @@ type Props = {
   undoRedoStack: UndoRedoStack,
   userIsWritingText: boolean,
   value: ?(FormBuilderValue[])
-}
+}*/
 
-function scrollIntoView(node: SlateNode, opts = {}) {
+function scrollIntoView(
+  node,
+  /*: SlateNode*/
+  opts = {}
+) {
   const element = findDOMNode(node) // eslint-disable-line react/no-find-dom-node
+
   element.scrollIntoView({
     behavior: opts.behavior || 'instant',
     block: opts.block || 'center',
@@ -110,29 +112,40 @@ function scrollIntoView(node: SlateNode, opts = {}) {
   })
 }
 
-export default class Editor extends React.Component<Props> {
+export default class Editor extends React.Component
+/*:: <Props>*/
+{
   static defaultProps = {
     readOnly: false,
     onPaste: undefined,
     renderCustomMarkers: undefined,
     renderBlockActions: undefined
   }
-  blockDragMarker: ?HTMLDivElement
-  editorSchema: SlateSchema
+  /*:: blockDragMarker: ?HTMLDivElement*/
 
-  editor: ElementRef<any> = React.createRef()
+  /*:: editorSchema: SlateSchema*/
 
+  editor =
+    /*: ElementRef<any>*/
+    React.createRef()
   plugins = []
 
-  constructor(props: Props) {
+  constructor(
+    props
+    /*: Props*/
+  ) {
     super(props)
     this.editorSchema = buildEditorSchema(props.blockContentFeatures)
     this.plugins = [
       QueryPlugin(),
-      ListItemOnEnterKeyPlugin({defaultBlock: EDITOR_DEFAULT_BLOCK_TYPE}),
+      ListItemOnEnterKeyPlugin({
+        defaultBlock: EDITOR_DEFAULT_BLOCK_TYPE
+      }),
       ListItemOnTabKeyPlugin(),
       ToggleListItemPlugin(),
-      TextBlockOnEnterKeyPlugin({defaultBlock: EDITOR_DEFAULT_BLOCK_TYPE}),
+      TextBlockOnEnterKeyPlugin({
+        defaultBlock: EDITOR_DEFAULT_BLOCK_TYPE
+      }),
       SetMarksOnKeyComboPlugin({
         decorators: props.blockContentFeatures.decorators.map(item => item.value)
       }),
@@ -149,8 +162,7 @@ export default class Editor extends React.Component<Props> {
       }),
       insertBlockOnEnter(EDITOR_DEFAULT_BLOCK_TYPE),
       OnDropPlugin(),
-      OnFocusPlugin(),
-      // OnBlurPlugin(),
+      OnFocusPlugin(), // OnBlurPlugin(),
       TogglePlaceHolderPlugin(),
       SetBlockStylePlugin(),
       ToggleAnnotationPlugin(),
@@ -159,7 +171,9 @@ export default class Editor extends React.Component<Props> {
       InsertInlineObjectPlugin(props.type),
       InsertBlockObjectPlugin(),
       EnsurePlaceHolderBlockPlugin(props.blockContentFeatures),
-      UndoRedoPlugin({stack: props.undoRedoStack}),
+      UndoRedoPlugin({
+        stack: props.undoRedoStack
+      }),
       FireFoxVoidNodePlugin(),
       FocusNoScrollPlugin(props.scrollContainer),
       ScrollAbsoluteTopBottomPlugin(props.scrollContainer),
@@ -171,45 +185,58 @@ export default class Editor extends React.Component<Props> {
     this.trackFocusPath()
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(
+    prevProps
+    /*: Props*/
+  ) {
     const editor = this.getEditor()
+
     if (!editor) {
       return
-    }
+    } // Check if focusPAth has changed from what is currently the focus in the editor
 
-    // Check if focusPAth has changed from what is currently the focus in the editor
     const {focusPath} = this.props
 
     if (!focusPath || focusPath.length === 0) {
       return
     }
+
     const focusPathChanged = !isEqual(prevProps.focusPath, focusPath)
+
     if (!focusPathChanged) {
       return
     }
-    this.trackFocusPath()
-  }
 
-  // Select the editor document element according to the focusPath and scroll there
+    this.trackFocusPath()
+  } // Select the editor document element according to the focusPath and scroll there
   // (unless it is a single block, then Slate will deal with it)
   // eslint-disable-next-line complexity
+
   trackFocusPath() {
     const {focusPath, editorValue} = this.props
     const editor = this.getEditor()
+
     if (!(editor && focusPath && editorValue)) {
       return
     }
+
     const focusPathIsSingleBlock =
-      editorValue.focusBlock && isEqual(focusPath, [{_key: editorValue.focusBlock.key}])
+      editorValue.focusBlock &&
+      isEqual(focusPath, [
+        {
+          _key: editorValue.focusBlock.key
+        }
+      ])
     const firstKey = focusPath[0] && focusPath[0]._key
     const block = firstKey && editorValue.document.getDescendant(firstKey)
     const isRootVoidBlock = block && editor.query('isVoid', block)
-    let inline
-    // Something inside a non-void root block is selected
+    let inline // Something inside a non-void root block is selected
+
     if (!focusPathIsSingleBlock && !isRootVoidBlock) {
       // Inline object
       const inlineKey = focusPath[2] && focusPath[2]._key
       inline = inlineKey && editorValue.document.getDescendant(inlineKey)
+
       if (
         inline &&
         focusPath[1] &&
@@ -217,171 +244,251 @@ export default class Editor extends React.Component<Props> {
         focusPath[2]
       ) {
         scrollIntoView(inline)
-      }
-      // (void) Block
+      } // (void) Block
       else if (block) {
         scrollIntoView(block)
       }
-    }
-    // The rest should be handled by Slate
-  }
+    } // The rest should be handled by Slate
+  } // When user changes the selection in the editor, update focusPath accordingly.
 
-  // When user changes the selection in the editor, update focusPath accordingly.
-  handleChange = (editor: SlateEditor) => {
+  handleChange = (
+    editor
+    /*: SlateEditor*/
+  ) => {
     const {onChange, onFocus, focusPath} = this.props
     const {focusBlock} = editor.value
     const path = []
+
     if (focusBlock) {
-      path.push({_key: focusBlock.key})
+      path.push({
+        _key: focusBlock.key
+      })
     }
+
     if (path.length && focusPath && focusPath.length === 1) {
       return onChange(editor, () => onFocus(path))
     }
+
     return onChange(editor)
   }
-
-  handleEditorFocus = (event: any, editor: SlateEditor, next: void => void) => {
+  handleEditorFocus = (
+    event,
+    /*: any*/
+    editor,
+    /*: SlateEditor*/
+    next
+    /*: void => void*/
+  ) => {
     this.props.setFocus() // Tell the formbuilder to set focus here
+
     next() // Continue Slate's focus plugin stack
   }
-
   getValue = () => {
     return this.props.value
   }
-
   getEditor = () => {
     if (this.editor && this.editor.current) {
       return this.editor.current
     }
+
     return null
   }
-
-  handlePasteProgress = ({status}: PasteProgressResult) => {
-    const {onLoading} = this.props
-    onLoading({paste: status})
-  }
-
-  handleShowBlockDragMarker = (pos: string, node: HTMLDivElement) => {
+  handlePasteProgress = ({status}) =>
+    /*: PasteProgressResult*/
+    {
+      const {onLoading} = this.props
+      onLoading({
+        paste: status
+      })
+    }
+  handleShowBlockDragMarker = (
+    pos,
+    /*: string*/
+    node
+    /*: HTMLDivElement*/
+  ) => {
     // eslint-disable-next-line react/no-find-dom-node
     const editorDOMNode = ReactDOM.findDOMNode(this.getEditor())
+
     if (editorDOMNode instanceof HTMLElement) {
       const elemRect = node.getBoundingClientRect()
       const topPos = node.scrollTop + node.offsetTop
       const bottomPos = node.scrollTop + node.offsetTop + elemRect.height
       const top = pos === 'after' ? `${bottomPos}px` : `${topPos}px`
+
       if (this.blockDragMarker) {
         this.blockDragMarker.style.display = 'block'
         this.blockDragMarker.style.top = top
       }
     }
   }
-
   handleHideBlockDragMarker = () => {
     if (this.blockDragMarker) {
       this.blockDragMarker.style.display = 'none'
     }
-  }
+  } // Handles user given onPaste function (or return default)
 
-  // Handles user given onPaste function (or return default)
   handlePaste = (
-    event: SyntheticEvent<>,
-    editor: SlateEditor,
-    next: void => void
-  ): Promise<any> | ?((void) => void) => {
-    event.persist() // Keep the event through the plugin chain after calling next()
+    event,
+    /*: SyntheticEvent<>*/
+    editor,
+    /*: SlateEditor*/
+    next
+    /*: void => void*/
+  ) =>
+    /*: Promise<any> | ?((void) => void)*/
+    {
+      event.persist() // Keep the event through the plugin chain after calling next()
 
-    const onPaste = this.props.onPaste || onPasteFromPart
-    if (!onPaste) {
-      return next()
-    }
-    const {focusPath, onPatch, onLoading, value, type} = this.props
-    onLoading({paste: 'start'})
+      const onPaste = this.props.onPaste || onPasteFromPart
 
-    const resolveOnPasteResultOrError = (): OnPasteResultOrPromise | Error => {
-      try {
-        return onPaste({event, value, path: focusPath, type})
-      } catch (error) {
-        return error
+      if (!onPaste) {
+        return next()
       }
+
+      const {focusPath, onPatch, onLoading, value, type} = this.props
+      onLoading({
+        paste: 'start'
+      })
+
+      const resolveOnPasteResultOrError = () =>
+        /*: OnPasteResultOrPromise | Error*/
+        {
+          try {
+            return onPaste({
+              event,
+              value,
+              path: focusPath,
+              type
+            })
+          } catch (error) {
+            return error
+          }
+        } // Resolve it as promise (can be either async promise or sync return value)
+
+      const resolved =
+        /*: Promise<OnPasteResultOrPromise>*/
+        Promise.resolve(resolveOnPasteResultOrError())
+      return resolved
+        .then((
+          result
+          /*: OnPasteResult*/
+        ) => {
+          onLoading({
+            paste: null
+          })
+
+          if (result === undefined) {
+            return next()
+          }
+
+          if (result instanceof Error) {
+            throw result
+          }
+
+          if (result && result.insert) {
+            const patches = [
+              setIfMissing(result.insert),
+              this.props.value && this.props.value.length !== 0
+                ? insert(result.insert, 'after', result.path || focusPath)
+                : set(result.insert, [])
+            ]
+            onPatch(PatchEvent.from(patches))
+            onLoading({
+              paste: null
+            })
+            return result.insert
+          }
+
+          console.warn('Your onPaste function returned something unexpected:', result) // eslint-disable-line no-console
+
+          return result
+        })
+        .catch(error => {
+          onLoading({
+            paste: null
+          })
+          console.error(error) // eslint-disable-line no-console
+
+          return error
+        })
     }
-
-    // Resolve it as promise (can be either async promise or sync return value)
-    const resolved: Promise<OnPasteResultOrPromise> = Promise.resolve(resolveOnPasteResultOrError())
-
-    return resolved
-      .then((result: OnPasteResult) => {
-        onLoading({paste: null})
-        if (result === undefined) {
-          return next()
-        }
-        if (result instanceof Error) {
-          throw result
-        }
-        if (result && result.insert) {
-          const patches = [
-            setIfMissing(result.insert),
-            this.props.value && this.props.value.length !== 0
-              ? insert(result.insert, 'after', result.path || focusPath)
-              : set(result.insert, [])
-          ]
-          onPatch(PatchEvent.from(patches))
-          onLoading({paste: null})
-          return result.insert
-        }
-        console.warn('Your onPaste function returned something unexpected:', result) // eslint-disable-line no-console
-        return result
-      })
-      .catch(error => {
-        onLoading({paste: null})
-        console.error(error) // eslint-disable-line no-console
-        return error
-      })
-  }
-
-  handleCopy = (event: SyntheticEvent<>, editor: SlateEditor, next: void => void) => {
+  handleCopy = (
+    event,
+    /*: SyntheticEvent<>*/
+    editor,
+    /*: SlateEditor*/
+    next
+    /*: void => void*/
+  ) => {
     if (onCopy) {
-      return onCopy({event})
+      return onCopy({
+        event
+      })
     }
-    return next()
-  }
 
-  // We do our own handling of dropping blocks and inline nodes,
+    return next()
+  } // We do our own handling of dropping blocks and inline nodes,
   // so break the slate plugin stack if transferring those node objects.
-  handleDrag = (event: SyntheticDragEvent<>, editor: SlateEditor, next: void => void) => {
+
+  handleDrag = (
+    event,
+    /*: SyntheticDragEvent<>*/
+    editor,
+    /*: SlateEditor*/
+    next
+    /*: void => void*/
+  ) => {
     const transfer = getEventTransfer(event)
     const {node} = transfer
+
     if (node && (node.object === 'block' || node.object === 'inline')) {
       event.dataTransfer.dropEffect = 'move'
       event.preventDefault()
       return true
     }
+
     return next()
   }
-
-  handleToggleFullscreen = (event: SyntheticEvent<>, editor: SlateEditor, next: void => void) => {
+  handleToggleFullscreen = (
+    event,
+    /*: SyntheticEvent<>*/
+    editor,
+    /*: SlateEditor*/
+    next
+    /*: void => void*/
+  ) => {
     const isFullscreenKey = isKeyHotkey('mod+enter')
     const isEsc = isKeyHotkey('esc')
     const {onToggleFullScreen, fullscreen} = this.props
+
     if (isFullscreenKey(event) || (isEsc(event) && fullscreen)) {
       event.preventDefault()
       event.stopPropagation()
       onToggleFullScreen(event)
       return true
     }
+
     return next()
   }
-
-  handleCancelEvent = (event: SyntheticEvent<>) => {
+  handleCancelEvent = (
+    event
+    /*: SyntheticEvent<>*/
+  ) => {
     event.preventDefault()
     event.stopPropagation()
   }
-
-  refBlockDragMarker = (blockDragMarker: ?HTMLDivElement) => {
+  refBlockDragMarker = (
+    blockDragMarker
+    /*: ?HTMLDivElement*/
+  ) => {
     this.blockDragMarker = blockDragMarker
-  }
+  } // eslint-disable-next-line complexity
 
-  // eslint-disable-next-line complexity
-  renderNode = (props: SlateComponentProps) => {
+  renderNode = (
+    props
+    /*: SlateComponentProps*/
+  ) => {
     const {
       blockContentFeatures,
       editorValue,
@@ -416,9 +523,10 @@ export default class Editor extends React.Component<Props> {
     if (node.type === 'span') {
       markers = this.props.markers.filter(
         marker => marker.path[2] && marker.path[2]._key === node.data.get('_key')
-      )
-      // Add any markers for related markDefs here as well
+      ) // Add any markers for related markDefs here as well
+
       let annotations
+
       if ((annotations = node.data.get('annotations'))) {
         const block = props.editor.value.document.getParent(node.key)
         Object.keys(annotations).forEach(key => {
@@ -446,7 +554,11 @@ export default class Editor extends React.Component<Props> {
               value
                 ? value.find(blk => blk._key === node.key)
                 : editorValueToBlocks(
-                    {document: {nodes: [node.toJSON(VALUE_TO_JSON_OPTS)]}},
+                    {
+                      document: {
+                        nodes: [node.toJSON(VALUE_TO_JSON_OPTS)]
+                      }
+                    },
                     type
                   )[0]
             }
@@ -462,6 +574,7 @@ export default class Editor extends React.Component<Props> {
             {props.children}
           </ContentBlock>
         )
+
       case 'span':
         return (
           <Span
@@ -479,6 +592,7 @@ export default class Editor extends React.Component<Props> {
             {props.children}
           </Span>
         )
+
       default:
         return (
           <ObjectClass
@@ -500,8 +614,10 @@ export default class Editor extends React.Component<Props> {
         )
     }
   }
-
-  renderMark = (props: SlateMarkProps) => {
+  renderMark = (
+    props
+    /*: SlateMarkProps*/
+  ) => {
     const {blockContentFeatures} = this.props
     const type = props.mark.type
     const decorator = blockContentFeatures.decorators.find(item => item.value === type)
@@ -509,9 +625,11 @@ export default class Editor extends React.Component<Props> {
       decorator && decorator.blockEditor && decorator.blockEditor.render
         ? decorator.blockEditor.render
         : null
+
     if (CustomComponent) {
       return <CustomComponent {...props} />
     }
+
     return decorator ? <Decorator {...props} /> : null
   }
 
@@ -528,15 +646,12 @@ export default class Editor extends React.Component<Props> {
       userIsWritingText,
       value
     } = this.props
-
     const hasMarkers = markers.filter(marker => marker.path.length > 0).length > 0
-
     const classNames = [
       styles.root,
       (renderBlockActions || hasMarkers) && styles.hasBlockExtras,
       fullscreen ? styles.fullscreen : null
     ].filter(Boolean)
-
     return (
       <div className={classNames.join(' ')}>
         <SlateReactEditor
@@ -560,7 +675,9 @@ export default class Editor extends React.Component<Props> {
         <div
           className={styles.blockDragMarker}
           ref={this.refBlockDragMarker}
-          style={{display: 'none'}}
+          style={{
+            display: 'none'
+          }}
           onDragOver={this.handleCancelEvent}
         />
         <div className={styles.blockExtras}>

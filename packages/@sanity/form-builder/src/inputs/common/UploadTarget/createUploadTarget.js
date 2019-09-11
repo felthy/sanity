@@ -1,50 +1,50 @@
-// @flow
+
 import React from 'react'
 import ReactDOM from 'react-dom'
-import type {Path} from '../../../typedefs/path'
-import {sortBy} from 'lodash'
+/*:: import type {Path} from '../../../typedefs/path'*/
 
-import type {Uploader} from '../../../sanity/uploads/typedefs'
-import type {Type} from '../../../typedefs/index'
+import {sortBy} from 'lodash'
+/*:: import type {Uploader} from '../../../sanity/uploads/typedefs'*/
+
+/*:: import type {Type} from '../../../typedefs/index'*/
 
 import Snackbar from 'part:@sanity/components/snackbar/default'
 import Button from 'part:@sanity/components/buttons/default'
 import Dialog from 'part:@sanity/components/dialogs/default'
-import styles from '../../../styles/UploadTarget.css'
 import humanize from 'humanize-list'
+import styles from '../../../styles/UploadTarget.css'
 import {extractDroppedFiles, extractPastedFiles} from './extractFiles'
 import {imageUrlToBlob} from './imageUrlToBlob'
-
-type Props = {
+/*:: type Props = {
   type: Type,
   children: () => {},
   className?: string,
   onFocus: ?(Path) => void,
   getUploadOptions: (type: Type, file: File) => UploadOption,
   onUpload?: (type: Type, file: File) => Uploader
-}
+}*/
 
-type UploadTask = {
+/*:: type UploadTask = {
   file: File,
   uploaderCandidates: Array<UploadOption>
-}
+}*/
 
-type State = {
+/*:: type State = {
   rejected: Array<UploadTask>,
   ambiguous: Array<UploadTask>,
   isMoving: ?boolean
-}
+}*/
 
 // this is a hack for Safari that reads pasted image(s) from an ContentEditable div instead of the onpaste event
 function convertImagesToFilesAndClearContentEditable(
-  element: HTMLDivElement,
+  element,
+  /*: HTMLDivElement*/
   targetFormat = 'image/jpeg'
-): Promise<Array<File>> {
+) {
+  /*: Promise<Array<File>>*/
   if (!element.isContentEditable) {
     throw new Error(
-      `Expected element to be contentEditable="true". Instead found a non contenteditable ${
-        element.tagName
-      }`
+      `Expected element to be contentEditable="true". Instead found a non contenteditable ${element.tagName}`
     )
   }
 
@@ -52,14 +52,20 @@ function convertImagesToFilesAndClearContentEditable(
     .then(() => Array.from(element.querySelectorAll('img')))
     .then(imageElements => {
       element.innerHTML = '' // clear
+
       return imageElements
     })
     .then(images => Promise.all(images.map(img => imageUrlToBlob(img.src))))
     .then(imageBlobs =>
-      imageBlobs.map(blob => new File([blob], 'pasted-image.jpg', {type: targetFormat}))
+      imageBlobs.map(
+        blob =>
+          new File([blob], 'pasted-image.jpg', {
+            type: targetFormat
+          })
+      )
     )
-}
-// needed by Edge
+} // needed by Edge
+
 function select(el) {
   const range = document.createRange()
   range.selectNodeContents(el)
@@ -69,57 +75,74 @@ function select(el) {
 }
 
 export function createUploadTarget(Component) {
-  return class UploadTargetFieldset extends React.Component<Props, State> {
-    _element: ?typeof Component
-    dragEnteredEls: Array<Element> = []
-
+  return class UploadTargetFieldset extends React.Component
+  /*:: <Props, State>*/
+  {
+    /*:: _element: ?typeof Component*/
+    dragEnteredEls =
+      /*: Array<Element>*/
+      []
     static defaultProps = {
       tabIndex: 0
     }
-
     state = {
       isDraggingOver: false,
       showPasteInput: false,
       rejected: [],
       ambiguous: []
     }
-
-    handleFocus = (event: SyntheticEvent<HTMLDivElement>) => {
+    handleFocus = (
+      event
+      /*: SyntheticEvent<HTMLDivElement>*/
+    ) => {
       const {onFocus} = this.props
       event.stopPropagation()
+
       if (onFocus) {
         onFocus(['$'])
       }
     }
-
-    handleKeyPress = (event: SyntheticKeyboardEvent<*>) => {
+    handleKeyPress = (
+      event
+      /*: SyntheticKeyboardEvent<*>*/
+    ) => {
       if (
         event.target === ReactDOM.findDOMNode(this) &&
         (event.ctrlKey || event.metaKey) &&
         event.key === 'v'
       ) {
-        this.setState({showPasteInput: true})
+        this.setState({
+          showPasteInput: true
+        })
       }
     }
-
-    handlePaste = (event: SyntheticClipboardEvent<*>) => {
+    handlePaste = (
+      event
+      /*: SyntheticClipboardEvent<*>*/
+    ) => {
       extractPastedFiles(event.clipboardData)
         .then(files => {
           return files.length > 0
-            ? files
-            : // Invoke Safari hack
-              convertImagesToFilesAndClearContentEditable(this._pasteInput, 'image/jpeg')
+            ? files // Invoke Safari hack
+            : convertImagesToFilesAndClearContentEditable(this._pasteInput, 'image/jpeg')
         })
         .then(files => {
           this.uploadFiles(files)
-          this.setState({showPasteInput: false})
+          this.setState({
+            showPasteInput: false
+          })
         })
     }
-
-    handleDrop = (event: SyntheticDragEvent<*>) => {
-      this.setState({isDraggingOver: false})
+    handleDrop = (
+      event
+      /*: SyntheticDragEvent<*>*/
+    ) => {
+      this.setState({
+        isDraggingOver: false
+      })
       event.preventDefault()
       event.stopPropagation()
+
       if (this.props.onUpload) {
         extractDroppedFiles(event.nativeEvent.dataTransfer).then(files => {
           if (files) {
@@ -128,44 +151,56 @@ export function createUploadTarget(Component) {
         })
       }
     }
-
-    handleDragOver = (event: SyntheticDragEvent<*>) => {
+    handleDragOver = (
+      event
+      /*: SyntheticDragEvent<*>*/
+    ) => {
       if (this.props.onUpload) {
         event.preventDefault()
         event.stopPropagation()
       }
     }
-
-    handleDragEnter = (event: SyntheticDragEvent<*>) => {
+    handleDragEnter = (
+      event
+      /*: SyntheticDragEvent<*>*/
+    ) => {
       event.stopPropagation()
       this.dragEnteredEls.push(event.target)
-      this.setState({isDraggingOver: true})
+      this.setState({
+        isDraggingOver: true
+      })
     }
-
-    handleDragLeave = (event: SyntheticDragEvent<*>) => {
+    handleDragLeave = (
+      event
+      /*: SyntheticDragEvent<*>*/
+    ) => {
       event.stopPropagation()
       const idx = this.dragEnteredEls.indexOf(event.target)
+
       if (idx > -1) {
         this.dragEnteredEls.splice(idx, 1)
       }
+
       if (this.dragEnteredEls.length === 0) {
-        this.setState({isDraggingOver: false})
+        this.setState({
+          isDraggingOver: false
+        })
       }
     }
 
-    uploadFiles(files: Array<File>) {
+    uploadFiles(
+      files
+      /*: Array<File>*/
+    ) {
       const tasks = files.map(file => ({
         file,
         uploaderCandidates: this.props.getUploadOptions(file)
       }))
-
       const ready = tasks.filter(task => task.uploaderCandidates.length > 0)
-
       const rejected = tasks.filter(task => task.uploaderCandidates.length === 0)
-
-      this.setState({rejected})
-
-      // todo: consider if we need to ask the user
+      this.setState({
+        rejected
+      }) // todo: consider if we need to ask the user
       // the list of candidates is sorted by their priority and the first one is selected
       // const ambiguous = tasks
       //   .filter(task => task.uploaderCandidates.length > 1)
@@ -178,28 +213,42 @@ export function createUploadTarget(Component) {
       })
     }
 
-    uploadFile(file: File, uploadOption: UploadOption) {
+    uploadFile(
+      file,
+      /*: File*/
+      uploadOption
+      /*: UploadOption*/
+    ) {
       const {onUpload} = this.props
       const {type, uploader} = uploadOption
-
-      onUpload({file, type, uploader})
+      onUpload({
+        file,
+        type,
+        uploader
+      })
     }
 
     componentDidUpdate(_, prevState) {
       if (!prevState.showPasteInput && this.state.showPasteInput) {
         this._pasteInput.focus()
+
         select(this._pasteInput) // Needed by Edge
       } else if (prevState.showPasteInput && !this.state.showPasteInput) {
         this.focus()
       }
     }
 
-    setPasteInput = (element: ?HTMLInputElement) => {
+    setPasteInput = (
+      element
+      /*: ?HTMLInputElement*/
+    ) => {
       // Only care about focus events from children
       this._pasteInput = element
     }
-
-    setElement = (element: ?HTMLDivElement) => {
+    setElement = (
+      element
+      /*: ?HTMLDivElement*/
+    ) => {
       // Only care about focus events from children
       this._element = element
     }
@@ -218,8 +267,16 @@ export function createUploadTarget(Component) {
             <Dialog
               isOpen
               title="Select how to represent"
-              actions={[{title: 'Cancel'}]}
-              onAction={() => this.setState({ambiguous: []})}
+              actions={[
+                {
+                  title: 'Cancel'
+                }
+              ]}
+              onAction={() =>
+                this.setState({
+                  ambiguous: []
+                })
+              }
             >
               {ambiguous.map(task => (
                 <div key={task.file.name}>
@@ -231,7 +288,9 @@ export function createUploadTarget(Component) {
                         <Button
                           onClick={() => {
                             this.uploadFile(task.file, uploaderCandidate)
-                            this.setState({ambiguous: ambiguous.filter(t => t !== task)})
+                            this.setState({
+                              ambiguous: ambiguous.filter(t => t !== task)
+                            })
                           }}
                         >
                           Represent as {uploaderCandidate.type.name}
@@ -248,7 +307,11 @@ export function createUploadTarget(Component) {
               kind="warning"
               isPersisted
               actionTitle="OK"
-              onAction={() => this.setState({rejected: []})}
+              onAction={() =>
+                this.setState({
+                  rejected: []
+                })
+              }
               title="File(s) not accepted:"
               subtitle={humanize(rejected.map(task => task.file.name))}
             />

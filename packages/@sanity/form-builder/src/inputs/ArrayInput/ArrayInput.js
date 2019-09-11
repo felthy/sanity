@@ -1,41 +1,52 @@
-// @flow
+
 import React from 'react'
 import ArrayFunctions from 'part:@sanity/form-builder/input/array/functions'
 import {map} from 'rxjs/operators'
 import {isPlainObject} from 'lodash'
-import type {Uploader} from '../../sanity/uploads/typedefs'
-import type {Marker, Type} from '../../typedefs'
-import type {Path} from '../../typedefs/path'
-import type {Subscription} from '../../typedefs/observable'
-import {resolveTypeName} from '../../utils/resolveTypeName'
+/*:: import type {Uploader} from '../../sanity/uploads/typedefs'*/
+
+/*:: import type {Marker, Type} from '../../typedefs'*/
+
+/*:: import type {Path} from '../../typedefs/path'*/
+
+/*:: import type {Subscription} from '../../typedefs/observable'*/
+
 import {FOCUS_TERMINATOR, startsWith} from '@sanity/util/paths'
-import UploadTargetFieldset from '../../utils/UploadTargetFieldset'
-import {insert, PatchEvent, set, setIfMissing, unset} from '../../PatchEvent'
-import styles from './styles/ArrayInput.css'
-import resolveListComponents from './resolveListComponents'
-import type {ArrayType, ItemValue} from './typedefs'
-import RenderItemValue from './ItemValue'
-import randomKey from './randomKey'
 import Button from 'part:@sanity/components/buttons/default'
 import Fieldset from 'part:@sanity/components/fieldsets/default'
+import {resolveTypeName} from '../../utils/resolveTypeName'
+import UploadTargetFieldset from '../../utils/UploadTargetFieldset'
+import {insert, PatchEvent, set, setIfMissing, unset} from '../../PatchEvent'
 import Details from '../common/Details'
+import styles from './styles/ArrayInput.css'
+import resolveListComponents from './resolveListComponents'
+/*:: import type {ArrayType, ItemValue} from './typedefs'*/
 
-function createProtoValue(type: Type): ItemValue {
+import RenderItemValue from './ItemValue'
+import randomKey from './randomKey'
+
+function createProtoValue(
+  type
+  /*: Type*/
+) {
+  /*: ItemValue*/
   if (type.jsonType !== 'object') {
     throw new Error(
       `Invalid item type: "${type.type}". Default array input can only contain objects (for now)`
     )
   }
+
   const key = randomKey(12)
   return type.name === 'object'
-    ? {_key: key}
+    ? {
+        _key: key
+      }
     : {
         _type: type.name,
         _key: key
       }
 }
-
-type Props = {
+/*:: type Props = {
   type: ArrayType,
   value: Array<ItemValue>,
   markers: Array<Marker>,
@@ -47,51 +58,85 @@ type Props = {
   readOnly: ?boolean,
   filterField: (field: any) => boolean,
   resolveUploader?: (type: Type, file: File) => Uploader
-}
+}*/
 
-export default class ArrayInput extends React.Component<Props, State> {
-  _element: ?UploadTargetFieldset
+export default class ArrayInput extends React.Component
+/*:: <Props, State>*/
+{
+  /*:: _element: ?UploadTargetFieldset*/
 
-  uploadSubscriptions: {[string]: Subscription}
+  /*:: uploadSubscriptions: {[string]: Subscription}*/
   uploadSubscriptions = {}
-
   static defaultProps = {
     focusPath: []
   }
   state = {
     isMoving: false
   }
-
-  insert = (itemValue: ItemValue, position: 'before' | 'after', atIndex: number) => {
+  insert = (
+    itemValue,
+    /*: ItemValue*/
+    position,
+    /*: 'before' | 'after'*/
+    atIndex
+    /*: number*/
+  ) => {
     const {onChange} = this.props
     onChange(PatchEvent.from(setIfMissing([]), insert([itemValue], position, [atIndex])))
   }
-
-  handlePrepend = (value: ItemValue) => {
+  handlePrepend = (
+    value
+    /*: ItemValue*/
+  ) => {
     this.insert(value, 'before', 0)
     this.handleFocusItem(value)
   }
-
-  handleAppend = (value: ItemValue) => {
+  handleAppend = (
+    value
+    /*: ItemValue*/
+  ) => {
     this.insert(value, 'after', -1)
     this.handleFocusItem(value)
   }
-
-  handleRemoveItem = (item: ItemValue) => {
+  handleRemoveItem = (
+    item
+    /*: ItemValue*/
+  ) => {
     this.removeItem(item)
   }
-
   handleFocus = () => {
     this.props.onFocus([FOCUS_TERMINATOR])
   }
-
-  handleFocusItem = (item: ItemValue) => {
-    this.props.onFocus([{_key: item._key}, FOCUS_TERMINATOR])
+  handleFocusItem = (
+    item
+    /*: ItemValue*/
+  ) => {
+    this.props.onFocus([
+      {
+        _key: item._key
+      },
+      FOCUS_TERMINATOR
+    ])
   }
 
-  removeItem(item: ItemValue) {
+  removeItem(
+    item
+    /*: ItemValue*/
+  ) {
     const {onChange, onFocus, value} = this.props
-    onChange(PatchEvent.from(unset(item._key ? [{_key: item._key}] : [value.indexOf(item)])))
+    onChange(
+      PatchEvent.from(
+        unset(
+          item._key
+            ? [
+                {
+                  _key: item._key
+                }
+              ]
+            : [value.indexOf(item)]
+        )
+      )
+    )
 
     if (item._key in this.uploadSubscriptions) {
       this.uploadSubscriptions[item._key].unsubscribe()
@@ -99,39 +144,59 @@ export default class ArrayInput extends React.Component<Props, State> {
 
     const idx = value.indexOf(item)
     const nextItem = value[idx + 1] || value[idx - 1]
-    onFocus([nextItem ? {_key: nextItem._key} : FOCUS_TERMINATOR])
+    onFocus([
+      nextItem
+        ? {
+            _key: nextItem._key
+          }
+        : FOCUS_TERMINATOR
+    ])
   }
 
-  handleItemChange = (event: PatchEvent, item: ItemValue) => {
+  handleItemChange = (
+    event,
+    /*: PatchEvent*/
+    item
+    /*: ItemValue*/
+  ) => {
     const {onChange, value} = this.props
-
     const memberType = this.getMemberTypeOfItem(item)
+
     if (!memberType) {
       // eslint-disable-next-line no-console
       console.log('Could not find member type of item ', item)
       return
     }
+
     if (memberType.readOnly) {
       return
     }
 
     const key = item._key || randomKey(12)
     onChange(
-      event.prefixAll({_key: key}).prepend(item._key ? [] : set(key, [value.indexOf(item), '_key']))
+      event
+        .prefixAll({
+          _key: key
+        })
+        .prepend(item._key ? [] : set(key, [value.indexOf(item), '_key']))
     )
   }
-
   handleSortStart = () => {
-    this.setState({isMoving: true})
+    this.setState({
+      isMoving: true
+    })
   }
-
-  handleSortEnd = (event: {newIndex: number, oldIndex: number}) => {
-    this.setState({isMoving: false})
+  handleSortEnd = (
+    event
+    /*: {newIndex: number, oldIndex: number}*/
+  ) => {
+    this.setState({
+      isMoving: false
+    })
     const {value, onChange} = this.props
     const item = value[event.oldIndex]
-    const refItem = value[event.newIndex]
+    const refItem = value[event.newIndex] // console.log('from %d => %d', event.oldIndex, event.newIndex, event)
 
-    // console.log('from %d => %d', event.oldIndex, event.newIndex, event)
     if (!item._key || !refItem._key) {
       // eslint-disable-next-line no-console
       console.error(
@@ -146,19 +211,30 @@ export default class ArrayInput extends React.Component<Props, State> {
 
     onChange(
       PatchEvent.from(
-        unset([{_key: item._key}]),
-        insert([item], event.oldIndex > event.newIndex ? 'before' : 'after', [{_key: refItem._key}])
+        unset([
+          {
+            _key: item._key
+          }
+        ]),
+        insert([item], event.oldIndex > event.newIndex ? 'before' : 'after', [
+          {
+            _key: refItem._key
+          }
+        ])
       )
     )
   }
 
-  getExpandedItem(): ?ItemValue {
+  getExpandedItem /*: ?ItemValue*/() {
     const {focusPath, value} = this.props
     const [head] = focusPath || []
     return head && value.find(item => item._key === head._key)
   }
 
-  getMemberTypeOfItem(item: ItemValue): ?Type {
+  getMemberTypeOfItem(
+    item /*: ?Type*/
+    /*: ItemValue*/
+  ) {
     const {type} = this.props
     const itemTypeName = resolveTypeName(item)
     return type.of.find(memberType => memberType.name === itemTypeName)
@@ -180,11 +256,8 @@ export default class ArrayInput extends React.Component<Props, State> {
     const options = type.options || {}
     const hasMissingKeys = value.some(item => !item._key)
     const isSortable = options.sortable !== false && !hasMissingKeys
-
     const isGrid = options.layout === 'grid'
-
     const {List, Item} = resolveListComponents(isSortable, isGrid)
-
     const listProps = isSortable
       ? {
           movingItemClass: styles.movingItem,
@@ -199,9 +272,21 @@ export default class ArrayInput extends React.Component<Props, State> {
       <List className={readOnly ? styles.listReadOnly : styles.list} {...listProps}>
         {value.map((item, index) => {
           const isChildMarker = marker =>
-            startsWith([index], marker.path) || startsWith([{_key: item && item._key}], marker.path)
+            startsWith([index], marker.path) ||
+            startsWith(
+              [
+                {
+                  _key: item && item._key
+                }
+              ],
+              marker.path
+            )
 
-          const itemProps = isSortable ? {index} : {}
+          const itemProps = isSortable
+            ? {
+                index
+              }
+            : {}
           return (
             <Item
               key={item._key}
@@ -234,34 +319,41 @@ export default class ArrayInput extends React.Component<Props, State> {
     }
   }
 
-  setElement = (el: ?UploadTargetFieldset) => {
+  setElement = (
+    el
+    /*: ?UploadTargetFieldset*/
+  ) => {
     this._element = el
   }
+  getUploadOptions = (
+    file
+    /*: File*/
+  ) =>
+    /*: Array<UploadOption>*/
+    {
+      const {type, resolveUploader} = this.props
 
-  getUploadOptions = (file: File): Array<UploadOption> => {
-    const {type, resolveUploader} = this.props
-    if (!resolveUploader) {
-      return []
+      if (!resolveUploader) {
+        return []
+      }
+
+      return type.of
+        .map(memberType => {
+          const uploader = resolveUploader(memberType, file)
+          return (
+            uploader && {
+              type: memberType,
+              uploader
+            }
+          )
+        })
+        .filter(Boolean)
     }
-    return type.of
-      .map(memberType => {
-        const uploader = resolveUploader(memberType, file)
-        return (
-          uploader && {
-            type: memberType,
-            uploader
-          }
-        )
-      })
-      .filter(Boolean)
-  }
-
   handleFixMissingKeys = () => {
     const {onChange, value} = this.props
     const patches = value.map((val, i) => setIfMissing(randomKey(), [i, '_key']))
     onChange(PatchEvent.from(...patches))
   }
-
   handleRemoveNonObjectValues = () => {
     const {onChange, value} = this.props
     const nonObjects = value
@@ -270,27 +362,25 @@ export default class ArrayInput extends React.Component<Props, State> {
     const patches = nonObjects.map(index => unset([index]))
     onChange(PatchEvent.from(...patches))
   }
-
   handleUpload = ({file, type, uploader}) => {
     const {onChange} = this.props
     const item = createProtoValue(type)
-
     const key = item._key
     this.insert(item, 'after', -1)
-
-    const events$ = uploader
-      .upload(file, type)
-      .pipe(map(uploadEvent => PatchEvent.from(uploadEvent.patches).prefixAll({_key: key})))
-
-    this.uploadSubscriptions = {
-      ...this.uploadSubscriptions,
-      [key]: events$.subscribe(onChange)
-    }
+    const events$ = uploader.upload(file, type).pipe(
+      map(uploadEvent =>
+        PatchEvent.from(uploadEvent.patches).prefixAll({
+          _key: key
+        })
+      )
+    )
+    this.uploadSubscriptions = {...this.uploadSubscriptions, [key]: events$.subscribe(onChange)}
   }
 
   render() {
     const {type, level, markers, readOnly, onChange, value} = this.props
     const hasNonObjectValues = (value || []).some(item => !isPlainObject(item))
+
     if (hasNonObjectValues) {
       return (
         <Fieldset
@@ -319,6 +409,7 @@ export default class ArrayInput extends React.Component<Props, State> {
     }
 
     const hasMissingKeys = (value || []).some(item => !item._key)
+
     if (hasMissingKeys) {
       return (
         <Fieldset
@@ -350,6 +441,7 @@ export default class ArrayInput extends React.Component<Props, State> {
         </Fieldset>
       )
     }
+
     return (
       <UploadTargetFieldset
         markers={markers}

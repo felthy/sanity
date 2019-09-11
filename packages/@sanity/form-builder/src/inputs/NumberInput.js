@@ -1,12 +1,11 @@
-//@flow
 import React from 'react'
 import TextInput from 'part:@sanity/components/textinputs/default'
 import FormField from 'part:@sanity/components/formfields/default'
 import {getValidationRule} from '../utils/getValidationRule'
 import PatchEvent, {set, unset} from '../PatchEvent'
-import type {Type, Marker} from '../typedefs'
+/*:: import type {Type, Marker} from '../typedefs'*/
 
-type Props = {
+/*:: type Props = {
   type: Type,
   level: number,
   value: ?string,
@@ -14,12 +13,16 @@ type Props = {
   onChange: PatchEvent => void,
   onFocus: () => void,
   markers: Array<Marker>
-}
+}*/
 
-export default class NumberInput extends React.Component<Props> {
-  _input: ?TextInput
-
-  handleChange = (event: SyntheticEvent<HTMLInputElement>) => {
+export default class NumberInput extends React.Component
+/*:: <Props>*/
+{
+  /*:: _input: ?TextInput*/
+  handleChange = (
+    event
+    /*: SyntheticEvent<HTMLInputElement>*/
+  ) => {
     const nextValue = event.currentTarget.value
     this.props.onChange(PatchEvent.from(nextValue === '' ? unset() : set(Number(nextValue))))
   }
@@ -30,19 +33,20 @@ export default class NumberInput extends React.Component<Props> {
     }
   }
 
-  setInput = (input: ?TextInput) => {
+  setInput = (
+    input
+    /*: ?TextInput*/
+  ) => {
     this._input = input
   }
 
   render() {
     const {value = '', readOnly, markers, type, level, onFocus} = this.props
     const validation = markers.filter(marker => marker.type === 'validation')
-    const errors = validation.filter(marker => marker.level === 'error')
+    const errors = validation.filter(marker => marker.level === 'error') // Show numpad on mobile if only positive numbers is preferred
 
-    // Show numpad on mobile if only positive numbers is preferred
     const minRule = getValidationRule(type, 'min')
     const onlyPositiveNumber = minRule && minRule.constraint >= 0
-
     return (
       <FormField markers={markers} level={level} label={type.title} description={type.description}>
         <TextInput

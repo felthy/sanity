@@ -1,19 +1,16 @@
-// @flow
+
 
 /* eslint-disable complexity */
-
 import React from 'react'
-import type {BlockContentFeatures, SlateValue, Path, SlateEditor, Type} from '../typeDefs'
+/*:: import type {BlockContentFeatures, SlateValue, Path, SlateEditor, Type} from '../typeDefs'*/
 
 import AnnotationButtons from './AnnotationButtons'
 import BlockStyleSelect from './BlockStyleSelect'
 import DecoratorButtons from './DecoratorButtons'
 import InsertMenu from './InsertMenu'
 import ListItemButtons from './ListItemButtons'
-
 import styles from './styles/PrimaryGroup.css'
-
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
   editorValue: SlateValue,
@@ -24,17 +21,19 @@ type Props = {
   insertItems: any[],
   isPopped?: boolean,
   isMobile?: boolean
-}
+}*/
 
-type State = {
+/*:: type State = {
   collapsePrimaryIsOpen: boolean,
   showValidationTooltip: boolean,
   collapsePrimary: boolean,
   isMobile: boolean,
   lastContentWidth: number
-}
+}*/
 
-export default class PrimaryGroup extends React.PureComponent<Props, State> {
+export default class PrimaryGroup extends React.PureComponent
+/*:: <Props, State>*/
+{
   static defaultProps = {
     isPopped: false,
     isMobile: false
@@ -57,6 +56,7 @@ export default class PrimaryGroup extends React.PureComponent<Props, State> {
     if (!editor) {
       return null
     }
+
     return (
       <div className={isPopped ? styles.isPopped : styles.root}>
         <div className={styles.blockStyleGroup}>

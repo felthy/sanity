@@ -13,7 +13,6 @@ function toBlob(uri) {
     .split(',')[0]
     .split(':')[1]
     .split(';')[0]
-
   const bytes = atob(uri.split(',')[1])
   const len = bytes.length
   const buffer = new window.ArrayBuffer(len)
@@ -23,7 +22,9 @@ function toBlob(uri) {
     arr[i] = bytes.charCodeAt(i)
   }
 
-  return new Blob([arr], {type: mime})
+  return new Blob([arr], {
+    type: mime
+  })
 }
 
 export function polyfillCanvasToBlob() {

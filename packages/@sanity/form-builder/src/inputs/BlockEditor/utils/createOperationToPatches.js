@@ -1,8 +1,7 @@
-// @flow
 
 import {Operation, Range} from 'slate'
 import {get, isEqual} from 'lodash'
-import type {
+/*:: import type {
   Block,
   BlockContentFeatures,
   FormBuilderValue,
@@ -10,9 +9,10 @@ import type {
   SlateNode,
   SlateValue,
   Type
-} from '../typeDefs'
-import {unset, set, insert, setIfMissing} from '../../../PatchEvent'
+} from '../typeDefs'*/
+
 import {editorValueToBlocks} from '@sanity/block-tools'
+import {unset, set, insert, setIfMissing} from '../../../PatchEvent'
 
 export const VALUE_TO_JSON_OPTS = {
   preserveData: true,
@@ -22,19 +22,24 @@ export const VALUE_TO_JSON_OPTS = {
 }
 
 function findSpanTargetPath(
-  nodeInEditorValue: SlateNode,
-  offset: number,
-  editorValue: SlateValue,
-  block: Block
+  nodeInEditorValue,
+  /*: SlateNode*/
+  offset,
+  /*: number*/
+  editorValue,
+  /*: SlateValue*/
+  block
+  /*: Block*/
 ) {
   if (nodeInEditorValue.object !== 'text') {
     throw new Error('Not a text node!')
   }
+
   const nodeInEditorValueParent = editorValue.document.getParent(nodeInEditorValue.key)
   let count = 0
-  let targetKey
-  // If the parent is an inline, we must calculate a new start count,
+  let targetKey // If the parent is an inline, we must calculate a new start count,
   // as inlines are not modelled in Portable Text, and the count will be off
+
   if (nodeInEditorValueParent.object === 'inline') {
     const texts = editorValue.document.getParent(nodeInEditorValueParent.key).getTexts()
     const previousNumberOfTexts = texts.findIndex(node => node.key === nodeInEditorValue.key)
@@ -43,39 +48,61 @@ function findSpanTargetPath(
       return acc + current.leaves.size
     }, 0)
     count = leavesCount
-  }
-  // Note: do 'some' here so we can short circuit it when we reach our target
+  } // Note: do 'some' here so we can short circuit it when we reach our target
   // and don't have to loop through everything
+
   nodeInEditorValueParent.nodes.some(node => {
     if (node.object === 'text') {
       let text = ''
       node.leaves.forEach(leaf => {
         text += leaf.text
+
         if (node === nodeInEditorValue && text.length > offset) {
           targetKey = `${block._key}${count}`
           return
         }
+
         count++
       })
     } else {
       count++
     }
+
     return node === nodeInEditorValue
   })
+
   if (targetKey) {
-    return [{_key: block._key}, 'children', {_key: targetKey}, 'text']
+    return [
+      {
+        _key: block._key
+      },
+      'children',
+      {
+        _key: targetKey
+      },
+      'text'
+    ]
   }
+
   throw new Error(`No target path found!`)
 }
 
 export default function createOperationToPatches(
-  blockContentFeatures: BlockContentFeatures,
-  blockContentType: Type
+  blockContentFeatures,
+  /*: BlockContentFeatures*/
+  blockContentType
+  /*: Type*/
 ) {
-  function toBlock(editorValue: SlateValue, index: number) {
+  function toBlock(
+    editorValue,
+    /*: SlateValue*/
+    index
+    /*: number*/
+  ) {
     if (!editorValue.document.nodes.get(index)) {
       throw new Error(`No block found at index ${index} in value`)
     }
+
     return editorValueToBlocks(
       {
         document: {
@@ -84,27 +111,31 @@ export default function createOperationToPatches(
       },
       blockContentType
     )[0]
-  }
+  } // eslint-disable-next-line complexity
 
-  // eslint-disable-next-line complexity
   function insertTextPatch(
-    operation: Operation,
-    beforeValue: SlateValue,
-    afterValue: SlateValue,
-    formBuilderValue: ?(FormBuilderValue[])
+    operation,
+    /*: Operation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*: ?(FormBuilderValue[])*/
   ) {
     // Make sure we have a document / start block first
     if (!formBuilderValue || formBuilderValue.length === 0) {
-      const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType)
-      // Value is undefined
+      const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType) // Value is undefined
+
       if (!formBuilderValue) {
         return [setIfMissing(blocks), set(blocks, [])]
-      }
-      // Value is empty
+      } // Value is empty
+
       if (formBuilderValue && formBuilderValue.length === 0) {
         return [set(blocks, [])]
       }
     }
+
     const blockBefore = toBlock(beforeValue, operation.path.get(0))
     const blockAfter = toBlock(afterValue, operation.path.get(0))
     const nodeInEditorValue = afterValue.document.getNode(operation.path)
@@ -115,33 +146,34 @@ export default function createOperationToPatches(
       blockAfter
     )
     const targetKey = get(targetPath.slice(-2)[0], '_key')
-
     const span = blockAfter.children.find(child => child._key === targetKey)
+
     if (!span) {
       throw new Error(`Could not find span with key '${targetKey}' in block`)
     }
 
-    const nodeInEditorValueBefore = beforeValue.document.getNode(operation.path)
-
-    // If leaves have changed, and we are not on the end of the text,
+    const nodeInEditorValueBefore = beforeValue.document.getNode(operation.path) // If leaves have changed, and we are not on the end of the text,
     // set the whole block so we get the new block structure right
+
     if (
       nodeInEditorValue.leaves.size !== beforeValue.document.getNode(operation.path).leaves.size &&
       operation.offset !== nodeInEditorValueBefore.text.length
     ) {
       return setNodePatch(operation, beforeValue, afterValue, formBuilderValue)
-    }
+    } // The span doesn't exist from before, so do an insert patch
 
-    // The span doesn't exist from before, so do an insert patch
     if (blockBefore.children.some(child => child._key === targetKey) === false) {
       const spanIndex = blockAfter.children.findIndex(child => child._key === targetKey)
-      const targetInsertPath = targetPath
-        .slice(0, -2)
-        .concat({_key: blockAfter.children[spanIndex - 1]._key})
+      const targetInsertPath = targetPath.slice(0, -2).concat({
+        _key: blockAfter.children[spanIndex - 1]._key
+      })
       return [insert([span], 'after', targetInsertPath)]
+    } // Check if marks have changed and set the whole span with new marks if so
+
+    const point = {
+      path: operation.path,
+      offset: operation.offset + 1
     }
-    // Check if marks have changed and set the whole span with new marks if so
-    const point = {path: operation.path, offset: operation.offset + 1}
     const textMarks = beforeValue.document
       .getMarksAtRange(
         Range.fromJSON({
@@ -151,43 +183,59 @@ export default function createOperationToPatches(
       )
       .map(mark => mark.type)
       .toArray()
+
     if (!isEqual(textMarks, span.marks)) {
       return [set(span, targetPath.slice(0, -1))]
-    }
-    // Marks not changed, just set the text
+    } // Marks not changed, just set the text
+
     return [set(span.text, targetPath)]
   }
 
   function setNodePatch(
-    operation: Operation,
-    beforeValue: SlateValue,
-    afterValue: SlateValue,
-    formBuilderValue: ?(FormBuilderValue[])
+    operation,
+    /*: Operation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*: ?(FormBuilderValue[])*/
   ) {
     if (
       afterValue.document.nodes.size > 0 &&
       afterValue.document.nodes.every(node => node.data.get('placeholder'))
     ) {
       return [unset([])]
-    }
-    // Value is undefined
+    } // Value is undefined
+
     if (!formBuilderValue) {
       const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType)
       return [setIfMissing(blocks), set(blocks)]
-    }
-    // Value is empty
+    } // Value is empty
+
     if (formBuilderValue && formBuilderValue.length === 0) {
       return [set(editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType), [])]
     }
+
     const block = toBlock(afterValue, operation.path.get(0))
-    return [set(block, [{_key: block._key}])]
+    return [
+      set(block, [
+        {
+          _key: block._key
+        }
+      ])
+    ]
   }
 
   function insertNodePatch(
-    operation: Operation,
-    beforeValue: SlateValue,
-    afterValue: SlateValue,
-    formBuilderValue: ?(FormBuilderValue[])
+    operation,
+    /*: Operation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*: ?(FormBuilderValue[])*/
   ) {
     // Don't send anything if this is just a placeholder
     if (
@@ -195,74 +243,124 @@ export default function createOperationToPatches(
       afterValue.document.nodes.every(node => node.data.get('placeholder'))
     ) {
       return []
-    }
-    // Value is undefined
+    } // Value is undefined
+
     if (!formBuilderValue) {
       const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType)
       return [setIfMissing(blocks), set(blocks, [])]
-    }
-    // Value is empty
+    } // Value is empty
+
     if (formBuilderValue && formBuilderValue.length === 0) {
       return [set(editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType), [])]
     }
+
     const block = toBlock(afterValue, operation.path.get(0))
+
     if (operation.path.size === 1) {
       let position = 'after'
       let positionPath
+
       if (operation.path.get(0) === 0) {
         const firstNode = beforeValue.document.nodes.first()
-        positionPath = firstNode ? [{_key: firstNode.key}] : [0]
+        positionPath = firstNode
+          ? [
+              {
+                _key: firstNode.key
+              }
+            ]
+          : [0]
         position = 'before'
       } else {
-        positionPath = [{_key: beforeValue.document.nodes.get(operation.path.get(0) - 1).key}]
+        positionPath = [
+          {
+            _key: beforeValue.document.nodes.get(operation.path.get(0) - 1).key
+          }
+        ]
       }
+
       return [insert([block], position, positionPath)]
     }
-    return [set(block, [{_key: block._key}])]
+
+    return [
+      set(block, [
+        {
+          _key: block._key
+        }
+      ])
+    ]
   }
 
   function splitNodePatch(
-    operation: Operation,
-    afterValue: SlateValue,
-    formBuilderValue: ?(FormBuilderValue[])
+    operation,
+    /*: Operation*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*: ?(FormBuilderValue[])*/
   ) {
     // Value is undefined
     if (!formBuilderValue) {
       const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType)
       return [setIfMissing(blocks), set(blocks)]
-    }
-    // Value is empty
+    } // Value is empty
+
     if (formBuilderValue && formBuilderValue.length === 0) {
       return [set(editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType), [])]
     }
+
     const patches = []
     const splitBlock = toBlock(afterValue, operation.path.get(0))
+
     if (operation.path.size === 1) {
-      patches.push(set(splitBlock, [{_key: splitBlock._key}]))
+      patches.push(
+        set(splitBlock, [
+          {
+            _key: splitBlock._key
+          }
+        ])
+      )
       const newBlock = toBlock(afterValue, operation.path.get(0) + 1)
-      patches.push(insert([newBlock], 'after', [{_key: splitBlock._key}]))
+      patches.push(
+        insert([newBlock], 'after', [
+          {
+            _key: splitBlock._key
+          }
+        ])
+      )
     }
+
     if (operation.path.size > 1) {
-      patches.push(set(splitBlock, [{_key: splitBlock._key}]))
+      patches.push(
+        set(splitBlock, [
+          {
+            _key: splitBlock._key
+          }
+        ])
+      )
     }
+
     return patches
   }
 
   function mergeNodePatch(
-    operation: Operation,
-    afterValue: SlateValue,
-    formBuilderValue: ?(FormBuilderValue[])
+    operation,
+    /*: Operation*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*: ?(FormBuilderValue[])*/
   ) {
-    const patches = []
-    // Value is undefined
+    const patches = [] // Value is undefined
+
     if (!formBuilderValue) {
       const blocks = editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType)
       return [setIfMissing(blocks), set(blocks)]
-    }
-    // Value is empty
+    } // Value is empty
+
     if (formBuilderValue && formBuilderValue.length === 0) {
       return [set(editorValueToBlocks(afterValue.toJSON(VALUE_TO_JSON_OPTS), blockContentType), [])]
     }
+
     if (operation.path.size === 1) {
       const mergedBlock = toBlock(afterValue, operation.path.get(0))
       const targetBlock = toBlock(afterValue, operation.path.get(0) - 1)
@@ -273,23 +371,44 @@ export default function createOperationToPatches(
           }
         ])
       )
-      patches.push(set(targetBlock, [{_key: targetBlock._key}]))
+      patches.push(
+        set(targetBlock, [
+          {
+            _key: targetBlock._key
+          }
+        ])
+      )
     }
 
     if (operation.path.size > 1) {
       const mergedBlock = toBlock(afterValue, operation.path.get(0))
-      patches.push(set(mergedBlock, [{_key: mergedBlock._key}]))
+      patches.push(
+        set(mergedBlock, [
+          {
+            _key: mergedBlock._key
+          }
+        ])
+      )
     }
 
     return patches
   }
 
-  function moveNodePatch(operation: Operation, beforeValue: SlateValue, afterValue: SlateValue) {
+  function moveNodePatch(
+    operation,
+    /*: Operation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue
+    /*: SlateValue*/
+  ) {
     const patches = []
+
     if (operation.path.size === 1) {
       if (operation.path.get(0) === operation.newPath.get(0)) {
         return []
       }
+
       const block = toBlock(beforeValue, operation.path.get(0))
       patches.push(
         unset([
@@ -300,79 +419,141 @@ export default function createOperationToPatches(
       )
       let position = 'after'
       let positionPath
+
       if (operation.path.get(0) === 0) {
         const firstNode = beforeValue.document.nodes.first()
-        positionPath = firstNode ? [{_key: firstNode.key}] : [0]
+        positionPath = firstNode
+          ? [
+              {
+                _key: firstNode.key
+              }
+            ]
+          : [0]
         position = 'before'
       } else {
-        positionPath = [{_key: beforeValue.document.nodes.get(operation.path.get(0) - 1).key}]
+        positionPath = [
+          {
+            _key: beforeValue.document.nodes.get(operation.path.get(0) - 1).key
+          }
+        ]
       }
+
       patches.push(insert(block, position, positionPath))
     } else {
       const changedBlockFrom = toBlock(afterValue, operation.path.get(0))
       const changedBlockTo = toBlock(afterValue, operation.newPath.get(0))
-      patches.push(set(changedBlockFrom, [{_key: changedBlockFrom._key}]))
-      patches.push(set(changedBlockTo, [{_key: changedBlockTo._key}]))
+      patches.push(
+        set(changedBlockFrom, [
+          {
+            _key: changedBlockFrom._key
+          }
+        ])
+      )
+      patches.push(
+        set(changedBlockTo, [
+          {
+            _key: changedBlockTo._key
+          }
+        ])
+      )
     }
+
     return patches
   }
 
-  function removeNodePatch(operation: Operation, beforeValue: SlateValue, afterValue: SlateValue) {
+  function removeNodePatch(
+    operation,
+    /*: Operation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue
+    /*: SlateValue*/
+  ) {
     const patches = []
     const block = toBlock(beforeValue, operation.path.get(0))
+
     if (operation.path.size === 1) {
-      patches.push(unset([{_key: block._key}]))
+      patches.push(
+        unset([
+          {
+            _key: block._key
+          }
+        ])
+      )
     }
+
     if (operation.path.size > 1) {
       // Only relevant for 'block' type blocks
       if (block._type !== 'block') {
         return patches
       }
+
       const changedBlock = toBlock(afterValue, operation.path.get(0))
-      patches.push(set(changedBlock, [{_key: changedBlock._key}]))
-    }
-    // If this is the last node in the document, send a patch taht completely removes the value
+      patches.push(
+        set(changedBlock, [
+          {
+            _key: changedBlock._key
+          }
+        ])
+      )
+    } // If this is the last node in the document, send a patch taht completely removes the value
     // (don't let it be left as an empty array)
+
     if (afterValue.document.nodes.size === 0) {
       patches.push(unset([]))
     }
+
     if (patches.length === 0) {
       throw new Error(
         `Don't know how to unset ${JSON.stringify(operation.toJSON(VALUE_TO_JSON_OPTS))}`
       )
     }
-    return patches
-  }
 
-  // eslint-disable-next-line complexity
+    return patches
+  } // eslint-disable-next-line complexity
+
   return function operationToPatches(
-    operation: SlateOperation,
-    beforeValue: SlateValue,
-    afterValue: SlateValue,
-    formBuilderValue?: ?(FormBuilderValue[]) // This is optional, but needed for setting setIfMissing patches correctly
+    operation,
+    /*: SlateOperation*/
+    beforeValue,
+    /*: SlateValue*/
+    afterValue,
+    /*: SlateValue*/
+    formBuilderValue
+    /*:: ?: ?(FormBuilderValue[])*/ // This is optional, but needed for setting setIfMissing patches correctly
   ) {
     // console.log(JSON.stringify(operation.toJSON(), null, 2))
     switch (operation.type) {
       case 'insert_text':
         return insertTextPatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'remove_text':
         return setNodePatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'add_mark':
         return setNodePatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'remove_mark':
         return setNodePatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'set_node':
         return setNodePatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'insert_node':
         return insertNodePatch(operation, beforeValue, afterValue, formBuilderValue)
+
       case 'remove_node':
         return removeNodePatch(operation, beforeValue, afterValue)
+
       case 'split_node':
         return splitNodePatch(operation, afterValue, formBuilderValue)
+
       case 'merge_node':
         return mergeNodePatch(operation, beforeValue, formBuilderValue)
+
       case 'move_node':
         return moveNodePatch(operation, beforeValue, afterValue)
+
       default:
         return []
     }

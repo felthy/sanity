@@ -9,11 +9,31 @@ import {
   Item as SortableGridListItem
 } from 'part:@sanity/components/lists/sortable-grid'
 
-export default function resolveListComponents(isSortable: boolean, isGrid: boolean) {
+export default function resolveListComponents(
+  isSortable,
+  /*: boolean*/
+  isGrid
+  /*: boolean*/
+) {
   if (isSortable) {
     return isGrid
-      ? {List: SortableGridList, Item: SortableGridListItem}
-      : {List: SortableList, Item: SortableListItem}
+      ? {
+          List: SortableGridList,
+          Item: SortableGridListItem
+        }
+      : {
+          List: SortableList,
+          Item: SortableListItem
+        }
   }
-  return isGrid ? {List: GridList, Item: GridListItem} : {List: DefaultList, Item: DefaultListItem}
+
+  return isGrid
+    ? {
+        List: GridList,
+        Item: GridListItem
+      }
+    : {
+        List: DefaultList,
+        Item: DefaultListItem
+      }
 }

@@ -12,17 +12,20 @@ function applyPatch(value, patch) {
   if (Array.isArray(value)) {
     return applyArrayPatch(value, patch)
   }
+
   if (isString(value)) {
     return applyStringPatch(value, patch)
   }
+
   if (isObject(value)) {
     return applyObjectPatch(value, patch)
   }
+
   return applyPrimitivePatch(value, patch)
 }
 
 export default function _apply(value, patch) {
-  const res = applyPatch(value, patch)
-  // console.log('applyPatch(%o, %o) : %o (noop? %o)', value, patch, res, value === res)
+  const res = applyPatch(value, patch) // console.log('applyPatch(%o, %o) : %o (noop? %o)', value, patch, res, value === res)
+
   return res
 }

@@ -1,8 +1,6 @@
-// @flow
-import type {ElementRef} from 'react'
 
-/* eslint-disable complexity */
 
+/*:: import type {ElementRef} from 'react'*/
 import React from 'react'
 import {Tooltip} from 'react-tippy'
 import Measure from 'react-measure'
@@ -15,8 +13,7 @@ import ValidationList from 'part:@sanity/components/validation/list'
 import WarningIcon from 'part:@sanity/base/warning-icon'
 import Poppable from 'part:@sanity/components/utilities/poppable'
 import {debounce, xor} from 'lodash'
-
-import type {BlockContentFeatures, SlateValue, Path, SlateEditor, Type, Marker} from '../typeDefs'
+/*:: import type {BlockContentFeatures, SlateValue, Path, SlateEditor, Type, Marker} from '../typeDefs'*/
 
 import IS_MAC from '../utils/isMac'
 import PrimaryGroup from './PrimaryGroup'
@@ -24,8 +21,7 @@ import styles from './styles/Toolbar.css'
 
 const collapsibleGroups = ['insertMenu', 'annotationButtons', 'decoratorButtons', 'listItemButtons']
 const BREAKPOINT_SCREEN_MEDIUM = 512
-
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
   editorValue: SlateValue,
@@ -36,18 +32,20 @@ type Props = {
   type: Type,
   isDragging: boolean,
   userIsWritingText: boolean
-}
+}*/
 
-type State = {
+/*:: type State = {
   collapsePrimaryIsOpen: boolean,
   showValidationTooltip: boolean,
   collapsePrimary: boolean,
   collapsedGroups: any,
   isMobile: boolean,
   lastContentWidth: number
-}
+}*/
 
-class Toolbar extends React.PureComponent<Props, State> {
+class Toolbar extends React.PureComponent
+/*:: <Props, State>*/
+{
   state = {
     collapsePrimaryIsOpen: false,
     collapsePrimary: false,
@@ -56,11 +54,16 @@ class Toolbar extends React.PureComponent<Props, State> {
     lastContentWidth: -1,
     isMobile: false
   }
+  _primaryToolbar =
+    /*: ElementRef<any>*/
+    React.createRef()
 
-  _primaryToolbar: ElementRef<any> = React.createRef()
-
-  constructor(props: Props) {
+  constructor(
+    props
+    /*: Props*/
+  ) {
     super(props)
+
     if (window) {
       this.state = {...this.state, isMobile: window.innerWidth < BREAKPOINT_SCREEN_MEDIUM}
     }
@@ -71,51 +74,55 @@ class Toolbar extends React.PureComponent<Props, State> {
       collapsePrimaryIsOpen: true
     })
   }
-
   handleClosePrimary = () => {
     this.setState({
       collapsePrimaryIsOpen: false
     })
   }
-
   handleClickOutsidePrimary = () => {
     this.setState({
       collapsePrimaryIsOpen: false
     })
   }
-
-  handleFocus = (focusPath: []) => {
+  handleFocus = (
+    focusPath
+    /*: []*/
+  ) => {
     const {onFocus} = this.props
     onFocus(focusPath)
   }
-
   handleCloseValidationResults = () => {
-    this.setState({showValidationTooltip: false})
+    this.setState({
+      showValidationTooltip: false
+    })
   }
-
   handleToggleValidationResults = () => {
-    this.setState(prevState => ({showValidationTooltip: !prevState.showValidationTooltip}))
+    this.setState(prevState => ({
+      showValidationTooltip: !prevState.showValidationTooltip
+    }))
   }
-
   handleResize = debounce(() => {
     if (this.state.isMobile) return
-
     const {_primaryToolbar} = this
     const {collapsedGroups, lastContentWidth, collapsePrimary} = this.state
-
     if (!_primaryToolbar || !_primaryToolbar.current) return
-
     const width = _primaryToolbar.current.offsetWidth
     const contentWidth = _primaryToolbar.current.scrollWidth
+
     if (contentWidth > width && !collapsePrimary) {
       const groupToCollapse = xor(collapsibleGroups, collapsedGroups)[0]
       this.setState(
-        {collapsedGroups: [...collapsedGroups, groupToCollapse], lastContentWidth: contentWidth},
+        {
+          collapsedGroups: [...collapsedGroups, groupToCollapse],
+          lastContentWidth: contentWidth
+        },
         () => {
           if (contentWidth > width && collapsedGroups.length != collapsibleGroups.length) {
             this.handleResize()
           } else if (collapsedGroups.length === collapsibleGroups.length && contentWidth > width) {
-            this.setState({collapsePrimary: true})
+            this.setState({
+              collapsePrimary: true
+            })
           }
         }
       )
@@ -151,17 +158,13 @@ class Toolbar extends React.PureComponent<Props, State> {
     }
 
     const {showValidationTooltip, isMobile} = this.state
-
     const insertItems = blockContentFeatures.types.inlineObjects.concat(
       blockContentFeatures.types.blockObjects
     )
-
     const validation = markers.filter(marker => marker.type === 'validation')
     const errors = validation.filter(marker => marker.level === 'error')
     const warnings = validation.filter(marker => marker.level === 'warning')
-
     const {collapsedGroups, collapsePrimary, collapsePrimaryIsOpen} = this.state
-
     return (
       <Measure offset scroll onResize={contentRect => this.handleResize(contentRect)}>
         {({measureRef}) => (
@@ -171,7 +174,9 @@ class Toolbar extends React.PureComponent<Props, State> {
               ${styles.root}
               ${fullscreen ? ` ${styles.fullscreen}` : ''}
             `}
-            style={{pointerEvents: isDragging ? 'none' : 'unset'}}
+            style={{
+              pointerEvents: isDragging ? 'none' : 'unset'
+            }}
           >
             <div className={styles.primary} ref={this._primaryToolbar}>
               {collapsePrimary && (
@@ -229,7 +234,9 @@ class Toolbar extends React.PureComponent<Props, State> {
                   onRequestClose={this.handleCloseValidationResults}
                   open={showValidationTooltip}
                   position="bottom"
-                  style={{padding: 0}}
+                  style={{
+                    padding: 0
+                  }}
                   theme="light noPadding"
                   trigger="click"
                 >
@@ -241,7 +248,11 @@ class Toolbar extends React.PureComponent<Props, State> {
                     padding="small"
                   >
                     {errors.length}
-                    <span style={{paddingLeft: '0.5em'}}>
+                    <span
+                      style={{
+                        paddingLeft: '0.5em'
+                      }}
+                    >
                       <ChevronDown />
                     </span>
                   </Button>

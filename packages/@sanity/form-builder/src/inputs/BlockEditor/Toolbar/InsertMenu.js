@@ -1,6 +1,6 @@
-// @flow
-import type {Node as ReactNode, Element as ReactElement} from 'react'
 
+
+/*:: import type {Node as ReactNode, Element as ReactElement} from 'react'*/
 import React from 'react'
 import DropDownButton from 'part:@sanity/components/buttons/dropdown'
 import Button from 'part:@sanity/components/buttons/default'
@@ -8,12 +8,11 @@ import BlockObjectIcon from 'part:@sanity/base/block-object-icon'
 import InlineObjectIcon from 'part:@sanity/base/inline-object-icon'
 import {Tooltip} from 'react-tippy'
 import {get} from 'lodash'
+/*:: import type {Type, SlateValue, SlateEditor, Path} from '../typeDefs'*/
 
-import type {Type, SlateValue, SlateEditor, Path} from '../typeDefs'
-import styles from './styles/InsertMenu.css'
 import {FOCUS_TERMINATOR} from '@sanity/util/paths'
-
-type Props = {
+import styles from './styles/InsertMenu.css'
+/*:: type Props = {
   blockTypes: Type[],
   editor: SlateEditor,
   editorValue: SlateValue,
@@ -21,19 +20,24 @@ type Props = {
   onFocus: Path => void,
   collapsed: boolean,
   showLabels: boolean
-}
+}*/
 
-type BlockItem = {
+/*:: type BlockItem = {
   title: string,
   value: Type,
   icon: any,
   key: string,
   isInline: boolean,
   isDisabled: boolean
-}
+}*/
 
-export default class InsertMenu extends React.Component<Props> {
-  shouldComponentUpdate(nextProps: Props) {
+export default class InsertMenu extends React.Component
+/*:: <Props>*/
+{
+  shouldComponentUpdate(
+    nextProps
+    /*: Props*/
+  ) {
     return (
       this.props.collapsed !== nextProps.collapsed ||
       this.props.blockTypes !== nextProps.blockTypes ||
@@ -42,7 +46,10 @@ export default class InsertMenu extends React.Component<Props> {
     )
   }
 
-  renderItem = (item: BlockItem) => {
+  renderItem = (
+    item
+    /*: BlockItem*/
+  ) => {
     const Icon = item.icon
     return (
       <div className={styles.item}>
@@ -55,41 +62,58 @@ export default class InsertMenu extends React.Component<Props> {
       </div>
     )
   }
-
-  renderButton = (item: BlockItem): ReactElement<Tooltip> => {
-    const {showLabels} = this.props
-    return (
-      <Tooltip
-        title={`Insert ${item.title}`}
-        disabled={this.props.collapsed}
-        key={`insertMenuItem_${item.key}`}
-        style={showLabels ? {display: 'block', flexGrow: 1, minWidth: 'fit-content'} : {}}
-      >
-        <Button
-          onClick={() => this.handleOnAction(item)}
+  renderButton = (
+    item
+    /*: BlockItem*/
+  ) =>
+    /*: ReactElement<Tooltip>*/
+    {
+      const {showLabels} = this.props
+      return (
+        <Tooltip
           title={`Insert ${item.title}`}
-          aria-label={`Insert ${item.title}`}
-          icon={item.icon}
-          kind="simple"
-          bleed
+          disabled={this.props.collapsed}
+          key={`insertMenuItem_${item.key}`}
+          style={
+            showLabels
+              ? {
+                  display: 'block',
+                  flexGrow: 1,
+                  minWidth: 'fit-content'
+                }
+              : {}
+          }
         >
-          {showLabels && item.title}
-        </Button>
-      </Tooltip>
-    )
-  }
-
-  getIcon = (type: Type, fallbackIcon: any) => {
+          <Button
+            onClick={() => this.handleOnAction(item)}
+            title={`Insert ${item.title}`}
+            aria-label={`Insert ${item.title}`}
+            icon={item.icon}
+            kind="simple"
+            bleed
+          >
+            {showLabels && item.title}
+          </Button>
+        </Tooltip>
+      )
+    }
+  getIcon = (
+    type,
+    /*: Type*/
+    fallbackIcon
+    /*: any*/
+  ) => {
     const referenceIcon = get(type, 'to[0].icon')
     return type.icon || (type.type && type.type.icon) || referenceIcon || fallbackIcon
   }
 
-  getItems(): BlockItem[] {
+  getItems /*: BlockItem[]*/() {
     const {editor} = this.props
     const {focusBlock} = editor.value
     let keyCount = 0
-    const blockItems = this.props.blockTypes.map(
-      (type, index): BlockItem => ({
+    const blockItems = this.props.blockTypes.map((type, index) =>
+      /*: BlockItem*/
+      ({
         title: type.title,
         value: type,
         key: (keyCount++).toString(),
@@ -98,8 +122,9 @@ export default class InsertMenu extends React.Component<Props> {
         isDisabled: false
       })
     )
-    const inlineItems = this.props.inlineTypes.map(
-      (type, index): BlockItem => ({
+    const inlineItems = this.props.inlineTypes.map((type, index) =>
+      /*: BlockItem*/
+      ({
         title: type.title,
         icon: this.getIcon(type, InlineObjectIcon),
         value: type,
@@ -111,23 +136,44 @@ export default class InsertMenu extends React.Component<Props> {
     return blockItems.concat(inlineItems)
   }
 
-  handleOnAction = (item: BlockItem) => {
+  handleOnAction = (
+    item
+    /*: BlockItem*/
+  ) => {
     const {onFocus, editor} = this.props
+
     if (item.isInline) {
-      editor.command('insertInlineObject', {objectType: item.value})
+      editor.command('insertInlineObject', {
+        objectType: item.value
+      })
       setTimeout(
         () =>
           onFocus([
-            {_key: editor.value.focusBlock.key},
+            {
+              _key: editor.value.focusBlock.key
+            },
             'children',
-            {_key: editor.value.focusInline.key},
+            {
+              _key: editor.value.focusInline.key
+            },
             FOCUS_TERMINATOR
           ]),
         200
       )
     } else {
-      editor.command('insertBlockObject', {objectType: item.value})
-      setTimeout(() => onFocus([{_key: editor.value.focusBlock.key}, FOCUS_TERMINATOR]), 200)
+      editor.command('insertBlockObject', {
+        objectType: item.value
+      })
+      setTimeout(
+        () =>
+          onFocus([
+            {
+              _key: editor.value.focusBlock.key
+            },
+            FOCUS_TERMINATOR
+          ]),
+        200
+      )
     }
   }
 
@@ -136,7 +182,7 @@ export default class InsertMenu extends React.Component<Props> {
     const items = this.getItems()
 
     if (!collapsed) {
-      return items.map<ReactNode>(this.renderButton)
+      return items.map(this.renderButton)
     }
 
     return (

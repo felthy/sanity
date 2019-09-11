@@ -1,26 +1,24 @@
-// @flow
+
 import React from 'react'
-import {FormBuilderInput} from '../../FormBuilderInput'
-import styles from './styles/Item.css'
 import Button from 'part:@sanity/components/buttons/default'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import ValidationStatus from 'part:@sanity/components/validation/status'
-
-import PatchEvent, {set} from '../../PatchEvent'
-import getEmptyValue from './getEmptyValue'
-
 import {createDragHandle} from 'part:@sanity/components/lists/sortable'
 import DragBarsIcon from 'part:@sanity/base/bars-icon'
-import type {Type, Marker} from '../../typedefs'
-import type {Path} from '../../typedefs/path'
+import PatchEvent, {set} from '../../PatchEvent'
+import {FormBuilderInput} from '../../FormBuilderInput'
+import getEmptyValue from './getEmptyValue'
+import styles from './styles/Item.css'
+/*:: import type {Type, Marker} from '../../typedefs'*/
+
+/*:: import type {Path} from '../../typedefs/path'*/
 
 const DragHandle = createDragHandle(() => (
   <span className={styles.dragHandle}>
     <DragBarsIcon />
   </span>
 ))
-
-type Props = {
+/*:: type Props = {
   type: Type,
   onChange: PatchEvent => void,
   onRemove: number => void,
@@ -35,39 +33,46 @@ type Props = {
   isSortable: boolean,
   readOnly: ?boolean,
   level: number
-}
-export default class Item extends React.PureComponent<Props> {
+}*/
+
+export default class Item extends React.PureComponent
+/*:: <Props>*/
+{
   handleRemove = () => {
     const {index, onRemove} = this.props
     onRemove(index)
   }
-
   handleKeyPress = event => {
     const {index, onEnterKey} = this.props
+
     if (event.key === 'Enter') {
       onEnterKey(index)
     }
   }
-
-  handleKeyUp = (event: SyntheticKeyEvent<*>) => {
+  handleKeyUp = (
+    event
+    /*: SyntheticKeyEvent<*>*/
+  ) => {
     const {index, onRemove, onEscapeKey, value} = this.props
+
     if (event.shiftKey && event.key === 'Backspace' && value === '') {
       onRemove(index)
     }
+
     if (event.key === 'Escape') {
       onEscapeKey(index)
     }
   }
-
-  handleChange = (patchEvent: PatchEvent) => {
+  handleChange = (
+    patchEvent
+    /*: PatchEvent*/
+  ) => {
     const {onChange, type, index} = this.props
     onChange(
       PatchEvent.from(
-        patchEvent.patches.map(
-          patch =>
-            // Map direct unset patches to empty value instead in order to not *remove* elements as the user clears out the value
-            patch.path.length === 0 && patch.type === 'unset' ? set(getEmptyValue(type)) : patch
-        )
+        patchEvent.patches.map((
+          patch // Map direct unset patches to empty value instead in order to not *remove* elements as the user clears out the value
+        ) => (patch.path.length === 0 && patch.type === 'unset' ? set(getEmptyValue(type)) : patch))
       ).prefixAll(index)
     )
   }

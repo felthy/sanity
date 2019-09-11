@@ -2,8 +2,8 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import DefaultButton from 'part:@sanity/components/buttons/default'
 import Details from '../common/Details'
-import styles from './InvalidValueInput.css'
 import PatchEvent, {set, unset} from '../../PatchEvent'
+import styles from './InvalidValueInput.css'
 import CONVERTERS from './converters'
 
 const setAutoHeight = el => {
@@ -18,6 +18,7 @@ function getConverters(value, actualType, validTypes) {
   if (!(actualType in CONVERTERS)) {
     return []
   }
+
   return Object.keys(CONVERTERS[actualType])
     .filter(targetType => validTypes.includes(targetType))
     .map(targetType => ({
@@ -35,11 +36,9 @@ export default class InvalidValue extends React.PureComponent {
     value: PropTypes.any,
     onChange: PropTypes.func
   }
-
   handleClearClick = () => {
     this.props.onChange(PatchEvent.from(unset()))
   }
-
   handleConvertTo = converted => {
     this.props.onChange(PatchEvent.from(set(converted)))
   }
@@ -52,6 +51,7 @@ export default class InvalidValue extends React.PureComponent {
 
   renderValidTypes() {
     const {validTypes} = this.props
+
     if (validTypes.length === 1) {
       return (
         <div>
@@ -59,6 +59,7 @@ export default class InvalidValue extends React.PureComponent {
         </div>
       )
     }
+
     return (
       <div>
         Only the following types are valid here according to schema:{' '}
@@ -74,6 +75,7 @@ export default class InvalidValue extends React.PureComponent {
   setElement = element => {
     this.element = element
   }
+
   render() {
     const {value, actualType, validTypes} = this.props
     const converters = getConverters(value, actualType, validTypes)
@@ -83,8 +85,7 @@ export default class InvalidValue extends React.PureComponent {
           Content has invalid type: <code>{actualType}</code>
         </h3>
         <Details>
-          Encountered a value of type <code>{actualType}</code>.
-          {this.renderValidTypes()}
+          Encountered a value of type <code>{actualType}</code>.{this.renderValidTypes()}
           <h4>The current value is:</h4>
           <textarea
             ref={setAutoHeight}

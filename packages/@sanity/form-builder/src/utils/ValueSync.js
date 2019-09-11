@@ -1,42 +1,43 @@
 import PropTypes from 'prop-types'
-// @flow
+
 import React from 'react'
-import type {Patch} from '../utils/patches'
+/*:: import type {Patch} from '../utils/patches'*/
+
 import {debounce} from 'lodash'
 import whyNotEqual from 'is-equal/why'
 import withPatchSubscriber from './withPatchSubscriber'
+/*:: declare var __DEV__: boolean*/
 
-declare var __DEV__: boolean
+/*:: type Deserialized = any*/
 
-type Deserialized = any
+/*:: type ChildProps = {value: Deserialized}*/
 
-type ChildProps = {value: Deserialized}
-
-type Props = {
+/*:: type Props = {
   value: Object,
   subscribe: Function,
   serialize: (value: Deserialized) => Object,
   deserialize: (value: Object) => Deserialized,
   applyPatch: (patch: Patch) => Deserialized,
   children: ChildProps => ?React$Element<any>
-}
+}*/
 
 export default withPatchSubscriber(
   class ValueSync extends React.Component {
-    props: Props
-
+    /*:: props: Props*/
     static contextTypes = {
       getValuePath: PropTypes.func,
       formBuilder: PropTypes.any
     }
+    /*:: state: {
+        value: Deserialized
+      }*/
 
-    state: {
-      value: Deserialized
-    }
+    /*:: unsubscribe: () => void*/
 
-    unsubscribe: () => void
-
-    constructor(props: Props) {
+    constructor(
+      props
+      /*: Props*/
+    ) {
       super()
       this.state = {
         value: props.deserialize(props.value)
@@ -47,8 +48,11 @@ export default withPatchSubscriber(
           console.warn(
             'Serialized local input value was reset due to a patch that targeted an ancestor'
           )
-          this.setState({value: props.deserialize(snapshot)})
+          this.setState({
+            value: props.deserialize(snapshot)
+          })
         }
+
         this.receivePatches(patches)
       })
     }
@@ -58,7 +62,10 @@ export default withPatchSubscriber(
       this.checkDiff.cancel()
     }
 
-    receivePatches(patches: Array<Patch>) {
+    receivePatches(
+      patches
+      /*: Array<Patch>*/
+    ) {
       const {applyPatch} = this.props
       this.setState(prevState => ({
         value: patches.reduce(applyPatch, prevState.value)
@@ -69,6 +76,7 @@ export default withPatchSubscriber(
       const propsVal = this.props.value
       const stateVal = this.state.value ? this.props.serialize(this.state.value) : this.state.value
       const notEqual = whyNotEqual(propsVal, stateVal)
+
       if (notEqual) {
         // eslint-disable-next-line no-console
         console.warn(

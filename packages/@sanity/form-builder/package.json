@@ -70,6 +70,11 @@
     "speakingurl": "^13.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.6.0",
+    "@babel/plugin-syntax-class-properties": "^7.2.0",
+    "@babel/plugin-syntax-flow": "^7.2.0",
+    "@babel/plugin-transform-flow-comments": "^7.6.0",
+    "@babel/preset-stage-0": "^7.0.0",
     "@sanity/base": "0.142.2",
     "@sanity/check": "0.142.0",
     "@sanity/cli": "0.142.2",

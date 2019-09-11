@@ -1,23 +1,25 @@
-// @flow
-import React from 'react'
 
+import React from 'react'
 import {Tooltip} from 'react-tippy'
 import CommentIcon from 'part:@sanity/base/comment-icon'
-import type {Marker} from '../typeDefs'
+/*:: import type {Marker} from '../typeDefs'*/
 
-type Props = {
+/*:: type Props = {
   markers: Marker[]
-}
+}*/
 
 // This is the fallback marker renderer if the block editor didn't get the 'renderCustomMarkers' prop
 // You will probably only see this when you first start to play with custom markers as a developer
-
-export default class Markers extends React.Component<Props> {
+export default class Markers extends React.Component
+/*:: <Props>*/
+{
   static defaultProps = {
     markers: []
   }
-
-  handleCustomMarkerClick = (event: SyntheticMouseEvent<>) => {
+  handleCustomMarkerClick = (
+    event
+    /*: SyntheticMouseEvent<>*/
+  ) => {
     event.preventDefault()
     event.stopPropagation()
     const {markers} = this.props
@@ -29,7 +31,6 @@ export default class Markers extends React.Component<Props> {
     const text = `${markers.length === 1 ? 'One' : markers.length} custom ${
       markers.length > 1 ? 'markers' : 'marker'
     }, click to log to console.`
-
     return (
       <Tooltip
         title={text}

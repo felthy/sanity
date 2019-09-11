@@ -1,22 +1,19 @@
-// @flow
-import type {Node} from 'react'
+
+
+/*:: import type {Node} from 'react'*/
 import ReactDOM from 'react-dom'
 import Base64 from 'slate-base64-serializer'
-
 import React, {Fragment} from 'react'
 import classNames from 'classnames'
-
 import {findDOMNode, findNode, setEventTransfer} from 'slate-react'
 import {Block} from 'slate'
-
 import {IntentLink} from 'part:@sanity/base/router'
 import LinkIcon from 'part:@sanity/base/link-icon'
 import EditIcon from 'part:@sanity/base/edit-icon'
 import VisibilityIcon from 'part:@sanity/base/visibility-icon'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import DropDownButton from 'part:@sanity/components/buttons/dropdown'
-
-import type {
+/*:: import type {
   BlockContentFeatures,
   FormBuilderValue,
   Marker,
@@ -25,27 +22,24 @@ import type {
   SlateEditor,
   SlateNode,
   Type
-} from '../typeDefs'
+} from '../typeDefs'*/
 
-import {PatchEvent} from '../../../PatchEvent'
 import {FOCUS_TERMINATOR} from '@sanity/util/paths'
+import {PatchEvent} from '../../../PatchEvent'
 import {resolveTypeName} from '../../../utils/resolveTypeName'
-
 import InvalidValue from '../../InvalidValueInput'
 import Preview from '../../../Preview'
-
 import styles from './styles/BlockObject.css'
-
-type DropDownButtonItem = {
+/*:: type DropDownButtonItem = {
   title: string,
   color: string,
   icon: ?any,
   intent: any,
   params: any,
   name: string
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   attributes: any,
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
@@ -60,24 +54,29 @@ type Props = {
   blockActions?: Node,
   renderCustomMarkers?: RenderCustomMarkers,
   type: ?Type
-}
+}*/
 
-type State = {
+/*:: type State = {
   isDragging: boolean
-}
+}*/
 
-export default class BlockObject extends React.Component<Props, State> {
-  _dropTarget: ?{node: SlateNode, position: string}
-  _editorNode: ?HTMLElement = null
-  _dragGhost: ?HTMLElement = null
-  previewContainer: ?HTMLDivElement
+export default class BlockObject extends React.Component
+/*:: <Props, State>*/
+{
+  /*:: _dropTarget: ?{node: SlateNode, position: string}*/
+  _editorNode =
+    /*: ?HTMLElement*/
+    null
+  _dragGhost =
+    /*: ?HTMLElement*/
+    null
+  /*:: previewContainer: ?HTMLDivElement*/
 
   static defaultProps = {
     blockActions: null,
     renderCustomMarkers: null,
     isSelected: false
   }
-
   state = {
     isDragging: false
   }
@@ -85,6 +84,7 @@ export default class BlockObject extends React.Component<Props, State> {
   componentDidMount() {
     const {editor} = this.props
     const elm = ReactDOM.findDOMNode(editor) // eslint-disable-line react/no-find-dom-node
+
     if (elm instanceof HTMLElement) {
       this._editorNode = elm
     }
@@ -96,12 +96,15 @@ export default class BlockObject extends React.Component<Props, State> {
 
   addDragHandlers() {
     const {readOnly} = this.props
+
     if (readOnly) {
       return
     }
+
     if (this._editorNode) {
       this._editorNode.addEventListener('dragover', this.handleDragOverOtherNode)
     }
+
     if (this._editorNode) {
       this._editorNode.addEventListener('dragleave', this.handleDragLeave)
     }
@@ -111,26 +114,38 @@ export default class BlockObject extends React.Component<Props, State> {
     if (this._editorNode) {
       this._editorNode.removeEventListener('dragover', this.handleDragOverOtherNode)
     }
+
     if (this._editorNode) {
       this._editorNode.removeEventListener('dragleave', this.handleDragLeave)
     }
   }
 
-  handleDragStart = (event: SyntheticDragEvent<HTMLElement>) => {
+  handleDragStart = (
+    event
+    /*: SyntheticDragEvent<HTMLElement>*/
+  ) => {
     const {node, readOnly} = this.props
+
     if (readOnly) {
       event.preventDefault()
       return
     }
-    this.setState({isDragging: true})
+
+    this.setState({
+      isDragging: true
+    })
     this.addDragHandlers()
-    const encoded = Base64.serializeNode(node, {preserveKeys: true, preserveData: true})
+    const encoded = Base64.serializeNode(node, {
+      preserveKeys: true,
+      preserveData: true
+    })
     setEventTransfer(event, 'node', encoded)
-    event.dataTransfer.effectAllowed = 'move'
-    // Specify dragImage so that single elements in the preview will not be the drag image,
+    event.dataTransfer.effectAllowed = 'move' // Specify dragImage so that single elements in the preview will not be the drag image,
     // but always the whole block thing itself.
     // Also clone it so that it will not be visually clipped by scroll-containers etc.
+
     const element = event.currentTarget
+
     if (element) {
       this._dragGhost = element.cloneNode(true)
       this._dragGhost.style.width = `${element.clientWidth}px`
@@ -138,9 +153,10 @@ export default class BlockObject extends React.Component<Props, State> {
       this._dragGhost.style.position = 'absolute'
       this._dragGhost.style.top = '-99999px'
       this._dragGhost.style.left = '-99999px'
+
       if (document.body) {
-        document.body.appendChild(this._dragGhost)
-        // eslint-disable-next-line max-depth
+        document.body.appendChild(this._dragGhost) // eslint-disable-next-line max-depth
+
         if (this._dragGhost) {
           const rect = element.getBoundingClientRect()
           const x = event.clientX - rect.left
@@ -149,10 +165,12 @@ export default class BlockObject extends React.Component<Props, State> {
         }
       }
     }
-  }
+  } // Remove the drop target if we leave the editors nodes
 
-  // Remove the drop target if we leave the editors nodes
-  handleDragLeave = (event: DragEvent) => {
+  handleDragLeave = (
+    event
+    /*: DragEvent*/
+  ) => {
     event.preventDefault()
     this.resetDropTarget()
   }
@@ -162,103 +180,116 @@ export default class BlockObject extends React.Component<Props, State> {
     this.props.onHideBlockDragMarker()
   }
 
-  handleDragOverOtherNode =
+  handleDragOverOtherNode = (
     // eslint-disable-next-line complexity
-    (event: DragEvent) => {
-      if (!this.state.isDragging) {
-        return
-      }
-
-      event.preventDefault()
-      event.stopPropagation()
-
-      const {node, editor} = this.props
-      let targetDOMNode
-      if (event.target instanceof HTMLElement) {
-        const keyNodes = event.target.querySelectorAll('[data-key]')
-        for (let i = 0; i < keyNodes.length; i++) {
-          const key = keyNodes[i].getAttribute('data-key')
-          const closestBlock = editor.value.document.getClosestBlock(key)
-          // eslint-disable-next-line max-depth
-          if (!targetDOMNode && closestBlock) {
-            targetDOMNode = findDOMNode(closestBlock)
-          }
-        }
-      }
-
-      // As the event is registered on the editor parent node
-      // ignore the event if it is coming from from the editor node itself
-      if (!targetDOMNode || targetDOMNode === this._editorNode) {
-        this.resetDropTarget()
-        return
-      }
-
-      if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = 'move'
-      }
-
-      const targetNode = findNode(targetDOMNode, editor)
-      if (!targetNode) {
-        this.resetDropTarget()
-        return
-      }
-
-      const block =
-        targetNode.object === 'block'
-          ? targetNode
-          : editor.value.document.getClosestBlock(targetNode.key)
-
-      // If no or same block reset and return
-      if (!block || block.key === node.key) {
-        this.resetDropTarget()
-        return
-      }
-      const blockDOMNode = findDOMNode(block)
-      const rect = blockDOMNode.getBoundingClientRect()
-      const position = event.clientY < rect.top + blockDOMNode.scrollHeight / 2 ? 'before' : 'after'
-
-      // If the block in the nearest vincinity (same position target), reset and return
-      let nearestNeighbour = false
-      if (position === 'before') {
-        const nextBlock = editor.value.document.getNextBlock(node.key)
-        nearestNeighbour = nextBlock && nextBlock.key === block.key
-      } else {
-        const previousBlock = editor.value.document.getPreviousBlock(node.key)
-        nearestNeighbour = previousBlock && previousBlock.key === block.key
-      }
-      if (nearestNeighbour) {
-        this.resetDropTarget()
-        return
-      }
-
-      this.props.onShowBlockDragMarker(position, blockDOMNode)
-
-      this._dropTarget = {node: block, position}
+    event
+    /*: DragEvent*/
+  ) => {
+    if (!this.state.isDragging) {
+      return
     }
 
-  handleDragEnd = (event: SyntheticDragEvent<>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const {node, editor} = this.props
+    let targetDOMNode
+
+    if (event.target instanceof HTMLElement) {
+      const keyNodes = event.target.querySelectorAll('[data-key]')
+
+      for (let i = 0; i < keyNodes.length; i++) {
+        const key = keyNodes[i].getAttribute('data-key')
+        const closestBlock = editor.value.document.getClosestBlock(key) // eslint-disable-next-line max-depth
+
+        if (!targetDOMNode && closestBlock) {
+          targetDOMNode = findDOMNode(closestBlock)
+        }
+      }
+    } // As the event is registered on the editor parent node
+    // ignore the event if it is coming from from the editor node itself
+
+    if (!targetDOMNode || targetDOMNode === this._editorNode) {
+      this.resetDropTarget()
+      return
+    }
+
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move'
+    }
+
+    const targetNode = findNode(targetDOMNode, editor)
+
+    if (!targetNode) {
+      this.resetDropTarget()
+      return
+    }
+
+    const block =
+      targetNode.object === 'block'
+        ? targetNode
+        : editor.value.document.getClosestBlock(targetNode.key) // If no or same block reset and return
+
+    if (!block || block.key === node.key) {
+      this.resetDropTarget()
+      return
+    }
+
+    const blockDOMNode = findDOMNode(block)
+    const rect = blockDOMNode.getBoundingClientRect()
+    const position = event.clientY < rect.top + blockDOMNode.scrollHeight / 2 ? 'before' : 'after' // If the block in the nearest vincinity (same position target), reset and return
+
+    let nearestNeighbour = false
+
+    if (position === 'before') {
+      const nextBlock = editor.value.document.getNextBlock(node.key)
+      nearestNeighbour = nextBlock && nextBlock.key === block.key
+    } else {
+      const previousBlock = editor.value.document.getPreviousBlock(node.key)
+      nearestNeighbour = previousBlock && previousBlock.key === block.key
+    }
+
+    if (nearestNeighbour) {
+      this.resetDropTarget()
+      return
+    }
+
+    this.props.onShowBlockDragMarker(position, blockDOMNode)
+    this._dropTarget = {
+      node: block,
+      position
+    }
+  }
+  handleDragEnd = (
+    event
+    /*: SyntheticDragEvent<>*/
+  ) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
-    this.setState({isDragging: false})
+    this.setState({
+      isDragging: false
+    })
     const target = this._dropTarget
     this.removeDragHandlers()
-    this.resetDropTarget()
-    // Remove the ghost
+    this.resetDropTarget() // Remove the ghost
+
     if (this._dragGhost && this._dragGhost.parentNode) {
       this._dragGhost.parentNode.removeChild(this._dragGhost)
     }
-    const {node, editor} = this.props
 
-    // Return if this is our node
+    const {node, editor} = this.props // Return if this is our node
+
     if (!target || target.node.key === node.key) {
       return
     }
+
     const targetIndex = target && target.node && editor.value.document.nodes.indexOf(target.node)
     const nodeIndex = editor.value.document.nodes.indexOf(node)
     let newIndex = target.position === 'before' ? targetIndex : targetIndex + 1
+
     if (targetIndex > nodeIndex) {
       newIndex--
     }
+
     editor
       .removeNodeByKey(node.key)
       .applyOperation({
@@ -269,27 +300,39 @@ export default class BlockObject extends React.Component<Props, State> {
       .moveToEndOfNode(node)
       .focus()
   }
-
-  handleCancelEvent = (event: SyntheticEvent<>) => {
+  handleCancelEvent = (
+    event
+    /*: SyntheticEvent<>*/
+  ) => {
     event.preventDefault()
     event.stopPropagation()
   }
-
-  handleFocus = (event: SyntheticMouseEvent<>) => {
+  handleFocus = (
+    event
+    /*: SyntheticMouseEvent<>*/
+  ) => {
     event.stopPropagation()
     const {node, onFocus} = this.props
-    onFocus([{_key: node.key}, FOCUS_TERMINATOR])
+    onFocus([
+      {
+        _key: node.key
+      },
+      FOCUS_TERMINATOR
+    ])
   }
-
-  handleDoubleClick = (event: SyntheticMouseEvent<>) => {
+  handleDoubleClick = (
+    event
+    /*: SyntheticMouseEvent<>*/
+  ) => {
     const {readOnly} = this.props
+
     if (readOnly) {
       this.handleView()
       return
     }
+
     this.handleEditStart()
   }
-
   handleEditStart = () => {
     const {node, onFocus, editor} = this.props
     editor
@@ -297,16 +340,26 @@ export default class BlockObject extends React.Component<Props, State> {
       .focus()
       .blur()
     setTimeout(() => {
-      onFocus([{_key: node.key}, FOCUS_TERMINATOR])
+      onFocus([
+        {
+          _key: node.key
+        },
+        FOCUS_TERMINATOR
+      ])
     }, 100)
   }
-
   handleClose = () => {
     const {node, onFocus} = this.props
-    onFocus([{_key: node.key}])
+    onFocus([
+      {
+        _key: node.key
+      }
+    ])
   }
-
-  refPreview = (previewContainer: ?HTMLDivElement) => {
+  refPreview = (
+    previewContainer
+    /*: ?HTMLDivElement*/
+  ) => {
     this.previewContainer = previewContainer
   }
 
@@ -314,14 +367,25 @@ export default class BlockObject extends React.Component<Props, State> {
     return this.props.node.data.get('value')
   }
 
-  handleInvalidValue = (event: PatchEvent) => {
+  handleInvalidValue = (
+    event
+    /*: PatchEvent*/
+  ) => {
     const {onPatch} = this.props
     const value = this.getValue()
-    onPatch(event.prefixAll({_key: value._key}), value)
+    onPatch(
+      event.prefixAll({
+        _key: value._key
+      }),
+      value
+    )
   }
-
-  handleHeaderMenuAction = (item: DropDownButtonItem) => {
+  handleHeaderMenuAction = (
+    item
+    /*: DropDownButtonItem*/
+  ) => {
     const {node, editor} = this.props
+
     if (item.name === 'delete') {
       editor.removeNodeByKey(node.key).focus()
     }
@@ -334,13 +398,19 @@ export default class BlockObject extends React.Component<Props, State> {
       this.handleView()
     }
   }
-
   handleView = () => {
     const {node, onFocus} = this.props
-    onFocus([{_key: node.key}, FOCUS_TERMINATOR])
+    onFocus([
+      {
+        _key: node.key
+      },
+      FOCUS_TERMINATOR
+    ])
   }
-
-  renderMenuItem = (item: DropDownButtonItem) => {
+  renderMenuItem = (
+    item
+    /*: DropDownButtonItem*/
+  ) => {
     const Icon = item.icon
     return (
       <div className={item.color === 'danger' ? styles.menuItemDanger : styles.menuItem}>
@@ -359,12 +429,16 @@ export default class BlockObject extends React.Component<Props, State> {
       </div>
     )
   }
-
-  handleMouseDown = (event: SyntheticMouseEvent<>) => {
+  handleMouseDown = (
+    event
+    /*: SyntheticMouseEvent<>*/
+  ) => {
     this.props.editor.moveToEndOfNode(this.props.node)
   }
-
-  renderPreview = (value: FormBuilderValue) => {
+  renderPreview = (
+    value
+    /*: FormBuilderValue*/
+  ) => {
     const {type, readOnly} = this.props
     const menuItems = []
 
@@ -373,9 +447,12 @@ export default class BlockObject extends React.Component<Props, State> {
         title: 'Go to reference',
         icon: LinkIcon,
         intent: 'edit',
-        params: {id: value._ref}
+        params: {
+          id: value._ref
+        }
       })
     }
+
     if (readOnly) {
       menuItems.push({
         title: 'View',
@@ -395,6 +472,7 @@ export default class BlockObject extends React.Component<Props, State> {
         color: 'danger'
       })
     }
+
     return (
       <div className={styles.preview}>
         <Preview type={type} value={value} layout="block" />
@@ -411,7 +489,6 @@ export default class BlockObject extends React.Component<Props, State> {
       </div>
     )
   }
-
   handleInvalidTypeContainerClick = event => {
     event.preventDefault()
     event.stopPropagation()
@@ -446,9 +523,9 @@ export default class BlockObject extends React.Component<Props, State> {
         </div>
       )
     }
+
     const validation = markers.filter(marker => marker.type === 'validation')
     const errors = validation.filter(marker => marker.level === 'error')
-
     const classname = classNames([
       styles.root,
       editor.value.selection.focus.isInNode(node) && styles.focused,
@@ -472,7 +549,13 @@ export default class BlockObject extends React.Component<Props, State> {
           <div
             ref={this.refPreview}
             className={styles.previewContainer}
-            style={readOnly ? {cursor: 'default'} : {}}
+            style={
+              readOnly
+                ? {
+                    cursor: 'default'
+                  }
+                : {}
+            }
           >
             {this.renderPreview(value)}
           </div>

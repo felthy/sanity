@@ -8,6 +8,7 @@ const BOOL_STRINGS = TRUTHY_STRINGS.concat(FALSEY_STRINGS)
 const TRUE = () => true
 
 const has = prop => val => val && val[prop]
+
 const is = typeName => val => (val && val._type) === typeName
 
 function toLocalDate(input) {
@@ -22,6 +23,7 @@ function getTZName() {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone
   } catch (e) {} // eslint-disable-line no-empty
+
   return null
 }
 
@@ -53,7 +55,10 @@ export default {
   date: {
     richDate: {
       test: is('date'),
-      convert: value => Object.assign({}, value, {_type: 'richDate'})
+      convert: value =>
+        Object.assign({}, value, {
+          _type: 'richDate'
+        })
     }
   },
   richDate: {

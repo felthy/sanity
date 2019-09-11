@@ -1,12 +1,9 @@
-// @flow
 
 import React, {Fragment} from 'react'
 import {findDOMNode} from 'slate-react'
 import BlockExtras from 'part:@sanity/form-builder/input/block-editor/block-extras'
-import PatchEvent from '../../../PatchEvent'
 import createBlockActionPatchFn from './utils/createBlockActionPatchFn'
-
-import type {
+/*:: import type {
   Marker,
   Path,
   FormBuilderValue,
@@ -15,9 +12,9 @@ import type {
   SlateNode,
   RenderBlockActions,
   RenderCustomMarkers
-} from './typeDefs'
+} from './typeDefs'*/
 
-type Props = {
+/*:: type Props = {
   editor: ?SlateEditor,
   editorValue: ?SlateValue,
   fullscreen: boolean,
@@ -28,27 +25,34 @@ type Props = {
   renderCustomMarkers?: RenderCustomMarkers,
   userIsWritingText: boolean,
   value: ?(FormBuilderValue[])
-}
+}*/
 
-type State = {
+/*:: type State = {
   windowWidth: ?Number,
   visible: boolean
-}
+}*/
 
-export default class BlockExtrasOverlay extends React.Component<Props, State> {
+export default class BlockExtrasOverlay extends React.Component
+/*:: <Props, State>*/
+{
   state = {
-    windowWidth: undefined, // eslint-disable-line react/no-unused-state
+    windowWidth: undefined,
+    // eslint-disable-line react/no-unused-state
     visible: false
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize)
-    // Wait for things to get finshed rendered before rendering the aboslute positions
+    window.addEventListener('resize', this.handleResize) // Wait for things to get finshed rendered before rendering the aboslute positions
+
     this._setVisibleTimer = setTimeout(() => {
       this._setVisibleRequest = window.requestAnimationFrame(() => {
-        this.setState({visible: true})
+        this.setState({
+          visible: true
+        })
         this._setVisibleTimer = setTimeout(() => {
-          this.setState({visible: true})
+          this.setState({
+            visible: true
+          })
         }, 200)
       })
     }, 0)
@@ -58,10 +62,12 @@ export default class BlockExtrasOverlay extends React.Component<Props, State> {
     window.removeEventListener('resize', this.handleResize)
     clearTimeout(this._setVisibleTimer)
     window.cancelAnimationFrame(this._setVisibleRequest)
-  }
+  } // Don't update this while user is writing
 
-  // Don't update this while user is writing
-  shouldComponentUpdate(nextProps: Props) {
+  shouldComponentUpdate(
+    nextProps
+    /*: Props*/
+  ) {
     return !nextProps.userIsWritingText
   }
 
@@ -69,10 +75,12 @@ export default class BlockExtrasOverlay extends React.Component<Props, State> {
     this.setState({
       windowWidth: window.innerWidth // eslint-disable-line react/no-unused-state
     })
-  }
+  } // eslint-disable-next-line complexity
 
-  // eslint-disable-next-line complexity
-  renderBlockExtras = (node: SlateNode) => {
+  renderBlockExtras = (
+    node
+    /*: SlateNode*/
+  ) => {
     const {
       onFocus,
       renderCustomMarkers,
@@ -84,28 +92,38 @@ export default class BlockExtrasOverlay extends React.Component<Props, State> {
     const markers = this.props.markers.filter(
       marker => marker.path[0] && marker.path[0]._key && marker.path[0]._key === node.key
     )
+
     if (markers.length === 0 && !renderBlockActions) {
       return null
     }
+
     let element
+
     try {
       element = findDOMNode(node) // eslint-disable-line react/no-find-dom-node
     } catch (err) {
       return null
     }
+
     const rect = element.getBoundingClientRect()
     let actions = null
     const value = this.props.value || []
+
     if (renderBlockActions) {
       const block = value.find(blk => blk._key == node.key)
       const RenderComponent = renderBlockActions
+
       if (block) {
         actions = (
           <RenderComponent
             element={element}
             block={block}
             value={value}
-            path={[{_key: block._key}]}
+            path={[
+              {
+                _key: block._key
+              }
+            ]}
             set={createBlockActionPatchFn('set', block, onPatch)}
             unset={createBlockActionPatchFn('unset', block, onPatch)}
             insert={createBlockActionPatchFn('insert', block, onPatch)}
@@ -113,9 +131,11 @@ export default class BlockExtrasOverlay extends React.Component<Props, State> {
         )
       }
     }
+
     if (markers.length === 0 && !actions) {
       return null
     }
+
     return (
       <div
         key={node.key}
@@ -143,6 +163,7 @@ export default class BlockExtrasOverlay extends React.Component<Props, State> {
   render() {
     const {visible} = this.state
     const {editorValue} = this.props
+
     if (!visible || !editorValue) {
       return null
     }

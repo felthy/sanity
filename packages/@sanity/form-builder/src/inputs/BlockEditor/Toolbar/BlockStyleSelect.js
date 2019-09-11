@@ -1,43 +1,48 @@
-// @flow
+
 import React from 'react'
-
 import StyleSelect from 'part:@sanity/components/selects/style'
-
 import Text from '../nodes/Text'
-
-import type {
+/*:: import type {
   BlockContentFeature,
   BlockContentFeatures,
   Path,
   SlateValue,
   SlateEditor
-} from '../typeDefs'
+} from '../typeDefs'*/
 
-export type BlockStyleItem = {
+/*:: export type BlockStyleItem = {
   key: string,
   active: boolean,
   title: string,
   style: string,
   preview: Node
-}
+}*/
 
-type Props = {
+/*:: type Props = {
   blockContentFeatures: BlockContentFeatures,
   editor: SlateEditor,
   editorValue: SlateValue,
   className: string
-}
+}*/
 
-export default class BlockStyleSelect extends React.Component<Props> {
-  shouldComponentUpdate(nextProps: Props) {
+export default class BlockStyleSelect extends React.Component
+/*:: <Props>*/
+{
+  shouldComponentUpdate(
+    nextProps
+    /*: Props*/
+  ) {
     const nextFocusBlock = nextProps.editorValue.focusBlock
     const currentFocusBlock = this.props.editorValue.focusBlock
+
     if (nextProps.editorValue.blocks.size > 1) {
       return true
     }
+
     if ((nextFocusBlock && nextFocusBlock.key) !== (currentFocusBlock && currentFocusBlock.key)) {
       return true
     }
+
     return (
       (nextFocusBlock && nextFocusBlock.data.get('style')) !==
       (currentFocusBlock && currentFocusBlock.data.get('style'))
@@ -46,7 +51,10 @@ export default class BlockStyleSelect extends React.Component<Props> {
 
   getItemsAndValue() {
     const {blockContentFeatures, editor} = this.props
-    const items = blockContentFeatures.styles.map((style: BlockContentFeature) => {
+    const items = blockContentFeatures.styles.map((
+      style
+      /*: BlockContentFeature*/
+    ) => {
       const styleComponent = style && style.blockEditor && style.blockEditor.render
       const preview = (
         <Text attributes={{}} style={style.value} styleComponent={styleComponent}>
@@ -62,6 +70,7 @@ export default class BlockStyleSelect extends React.Component<Props> {
       }
     })
     let value = items.filter(item => item.active)
+
     if (value.length === 0) {
       items.push({
         key: 'style-none',
@@ -72,35 +81,48 @@ export default class BlockStyleSelect extends React.Component<Props> {
       })
       value = items.slice(-1)
     }
+
     return {
       items: items,
       value: value
     }
   }
 
-  handleChange = (item: BlockStyleItem) => {
+  handleChange = (
+    item
+    /*: BlockStyleItem*/
+  ) => {
     const {editor} = this.props
     editor.command('setBlockStyle', item.style)
     editor.command('focusNoScroll')
     this.forceUpdate()
   }
-
-  renderItem = (item: BlockStyleItem) => {
+  renderItem = (
+    item
+    /*: BlockStyleItem*/
+  ) => {
     return item.preview
   }
 
   render() {
     const {items, value} = this.getItemsAndValue()
+
     if (!items || items.length < 2) {
       return null
     }
+
     const {editorValue, className} = this.props
     const {focusBlock} = editorValue
     const disabled = focusBlock ? focusBlock.isVoid : false
-
     return (
       <label className={className}>
-        <span style={{display: 'none'}}>Text</span>
+        <span
+          style={{
+            display: 'none'
+          }}
+        >
+          Text
+        </span>
         <StyleSelect
           items={items}
           value={value}

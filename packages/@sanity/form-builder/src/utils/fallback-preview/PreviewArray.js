@@ -1,12 +1,16 @@
-// @flow
+
 import React from 'react'
 import {PreviewAny} from './PreviewAny'
-type Props = {
+/*:: type Props = {
   value: Array<*>,
   maxDepth?: number,
   _depth?: number
-}
-export function PreviewArray(props: Props) {
+}*/
+
+export function PreviewArray(
+  props
+  /*: Props*/
+) {
   const {value, maxDepth = 4, _depth = 0, ...rest} = props
 
   if (_depth >= maxDepth) {

@@ -1,13 +1,12 @@
+import {get} from 'lodash'
 import OptionsArray from '../../inputs/OptionsArrayInput'
 import BlockEditor from '../../inputs/BlockEditor'
 import ArrayOfPrimitivesInput from '../../inputs/ArrayOfPrimitivesInput'
 import TagsArrayInput from '../../inputs/TagsArrayInput'
 import * as is from '../../utils/is'
-import {get} from 'lodash'
 import SanityArrayInput from '../inputs/SanityArrayInput'
 
 const PRIMITIVES = ['string', 'number', 'boolean']
-
 export function isArrayOfPrimitives(type) {
   return type.of.every(ofType => PRIMITIVES.includes(ofType.jsonType))
 }
@@ -25,7 +24,6 @@ function hasBlocks(type) {
 export function hasOptionsList(type) {
   return get(type.options, 'list')
 }
-
 export default function resolveArrayInput(type) {
   // Schema provides predefines list
   if (hasOptionsList(type)) {
@@ -34,18 +32,15 @@ export default function resolveArrayInput(type) {
 
   if (isTagsArray(type)) {
     return TagsArrayInput
-  }
+  } // Special component for array of primitive values
 
-  // Special component for array of primitive values
   if (isArrayOfPrimitives(type)) {
     return ArrayOfPrimitivesInput
-  }
+  } // Use block editor if its an array that includes blocks
 
-  // Use block editor if its an array that includes blocks
   if (hasBlocks(type)) {
     return BlockEditor
-  }
+  } // use default
 
-  // use default
   return SanityArrayInput
 }

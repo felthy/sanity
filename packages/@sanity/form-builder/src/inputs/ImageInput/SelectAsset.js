@@ -1,4 +1,4 @@
-// @flow
+
 import React from 'react'
 import client from 'part:@sanity/base/client'
 import Button from 'part:@sanity/components/buttons/default'
@@ -6,18 +6,19 @@ import styles from './styles/SelectAsset.css'
 import AssetWidget from './Asset'
 
 const PER_PAGE = 200
-
-type Asset = {
+/*:: type Asset = {
   _id: string,
   url: string
-}
-type State = {
+}*/
+
+/*:: type State = {
   assets: Array<Asset>,
   isLastPage: boolean
-}
-type Props = {
+}*/
+
+/*:: type Props = {
   onSelect: Asset => void
-}
+}*/
 
 function createQuery(start = 0, end = PER_PAGE) {
   return `
@@ -29,20 +30,27 @@ function createQuery(start = 0, end = PER_PAGE) {
   `
 }
 
-export default class SelectAsset extends React.Component<Props, State> {
+export default class SelectAsset extends React.Component
+/*:: <Props, State>*/
+{
   state = {
     assets: [],
     isLastPage: false,
     isLoading: false
   }
+  /*:: pageNo: number*/
 
-  pageNo: number
   pageNo = 0
 
-  fetchPage(pageNo: number) {
+  fetchPage(
+    pageNo
+    /*: number*/
+  ) {
     const start = pageNo * PER_PAGE
     const end = start + PER_PAGE
-    this.setState({isLoading: true})
+    this.setState({
+      isLoading: true
+    })
     return client.fetch(createQuery(start, end)).then(result => {
       this.setState(prevState => ({
         isLastPage: result.length < PER_PAGE,
@@ -64,17 +72,23 @@ export default class SelectAsset extends React.Component<Props, State> {
 
   select(id) {
     const selected = this.state.assets.find(doc => doc._id === id)
+
     if (selected) {
       this.props.onSelect(selected)
     }
   }
 
-  handleItemClick = (event: SyntheticEvent<*>) => {
+  handleItemClick = (
+    event
+    /*: SyntheticEvent<*>*/
+  ) => {
     event.preventDefault()
     this.select(event.currentTarget.getAttribute('data-id'))
   }
-
-  handleItemKeyPress = (event: SyntheticEvent<*>) => {
+  handleItemKeyPress = (
+    event
+    /*: SyntheticEvent<*>*/
+  ) => {
     if (event.key === 'Enter') {
       event.preventDefault()
       this.select(event.currentTarget.getAttribute('data-id'))

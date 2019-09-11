@@ -1,7 +1,7 @@
 import React from 'react'
 import {ImageInput} from '../..'
-import {materializeReference} from './client-adapters/assets'
 import resolveUploader from '../uploads/resolveUploader'
+import {materializeReference} from './client-adapters/assets'
 
 export default class SanityImageInput extends React.Component {
   focus() {
@@ -9,9 +9,11 @@ export default class SanityImageInput extends React.Component {
       this._input.focus()
     }
   }
+
   setInput = input => {
     this._input = input
   }
+
   render() {
     return (
       <ImageInput

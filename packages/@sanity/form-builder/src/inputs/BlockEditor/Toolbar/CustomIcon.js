@@ -1,13 +1,14 @@
-// @flow
 
 import React from 'react'
-
-type Props = {
+/*:: type Props = {
   icon: string,
   active: boolean
-}
+}*/
 
-export default function CustomIcon(props: Props) {
+export default function CustomIcon(
+  props
+  /*: Props*/
+) {
   const {icon, active} = props
   const style = {
     width: '1em',

@@ -1,31 +1,31 @@
-import type Moment from 'moment'
-// @flow
+/*:: import type Moment from 'moment'*/
+
 import moment from 'moment'
 import 'react-datepicker/dist/react-datepicker-cssmodules.css' // eslint-disable-line import/no-unassigned-import
+
 import {uniqueId} from 'lodash'
 import React from 'react'
 import PatchEvent, {set, unset} from '../../PatchEvent'
-import type {Marker} from '../../typedefs'
-import BaseDateTimeInput from './BaseDateTimeInput'
+/*:: import type {Marker} from '../../typedefs'*/
 
-type ParsedOptions = {
+import BaseDateTimeInput from './BaseDateTimeInput'
+/*:: type ParsedOptions = {
   dateFormat: string,
   timeFormat: string,
   timeStep: number,
   calendarTodayLabel: string
-}
+}*/
 
-type SchemaOptions = {
+/*:: type SchemaOptions = {
   dateFormat?: string,
   timeFormat?: string,
   timeStep?: number,
   calendarTodayLabel?: string
-}
+}*/
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD'
 const DEFAULT_TIME_FORMAT = 'HH:mm'
-
-type Props = {
+/*:: type Props = {
   value: string,
   markers: Array<Marker>,
   type: {
@@ -38,9 +38,13 @@ type Props = {
   readOnly: ?boolean,
   onChange: PatchEvent => void,
   level: number
-}
+}*/
 
-function parseOptions(options: SchemaOptions = {}): ParsedOptions {
+function parseOptions(
+  /*: SchemaOptions*/
+  options = {}
+) {
+  /*: ParsedOptions*/
   return {
     dateFormat: options.dateFormat || DEFAULT_DATE_FORMAT,
     timeFormat: options.timeFormat || DEFAULT_TIME_FORMAT,
@@ -49,10 +53,16 @@ function parseOptions(options: SchemaOptions = {}): ParsedOptions {
   }
 }
 
-export default class DateInput extends React.Component<Props> {
-  baseDateTimeInputRef: ?BaseDateTimeInput = null
-
-  handleChange = (nextMoment?: Moment) => {
+export default class DateInput extends React.Component
+/*:: <Props>*/
+{
+  baseDateTimeInputRef =
+    /*: ?BaseDateTimeInput*/
+    null
+  handleChange = (
+    nextMoment
+    /*:: ?: Moment*/
+  ) => {
     const patch = nextMoment ? set(nextMoment.toDate().toJSON()) : unset()
     this.props.onChange(PatchEvent.from([patch]))
   }
@@ -63,17 +73,20 @@ export default class DateInput extends React.Component<Props> {
     }
   }
 
-  setBaseInput = (baseInput: ?BaseDateTimeInput) => {
+  setBaseInput = (
+    baseInput
+    /*: ?BaseDateTimeInput*/
+  ) => {
     this.baseDateTimeInputRef = baseInput
   }
 
   render() {
     const {value, markers, type, readOnly, level} = this.props
     const {title, description} = type
-    const momentValue: ?Moment = value ? moment(value) : null
-
+    const momentValue =
+      /*: ?Moment*/
+      value ? moment(value) : null
     const options = parseOptions(type.options)
-
     return (
       <BaseDateTimeInput
         ref={this.setBaseInput}
